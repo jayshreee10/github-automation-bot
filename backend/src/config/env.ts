@@ -7,6 +7,7 @@ const envSchema = z.object({
     .default('development'),
   PORT: z.coerce.number().int().positive().default(4000),
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+  NEON_AUTH_URL: z.url({ protocol: /^https$/ }),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -1,7 +1,6 @@
+import { RouterProvider } from 'react-router'
+import { router } from '@/router'
+
 export default function App() {
-  return (
-    <main className="page">
-      <h1 className="page-title">GitHub Automation Bot</h1>
-    </main>
-  )
+  return <RouterProvider router={router} />
 }

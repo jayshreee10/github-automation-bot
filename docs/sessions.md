@@ -5,6 +5,7 @@ How this project is built, one session at a time. Each session ends with working
 Source spec: [`prd.md`](prd.md)
 Workflow commands: [`commands.md`](commands.md)
 Tech stack: [`tech-stack.md`](tech-stack.md)
+Phase plans: [`phase/`](phase/) — [phase 1: authentication](phase/phase-1.md)
 
 ---
 
@@ -12,20 +13,24 @@ Tech stack: [`tech-stack.md`](tech-stack.md)
 
 ```
  GitHub ──webhook──▶ NestJS API ──▶ Neon Postgres
-   ▲                    │   ▲                  (events, jobs, rules, actions)
-   │  label / comment   │   │ /api/* proxied
+   ▲                    │   ▲                  (events, jobs, rules, actions,
+   │  label / comment   │   │ /api/* + JWT      neon_auth users)
    └────────────────────┘   │
                             │
- Browser ──▶ React SPA ──/api proxy──────┘
-                            │
+ Browser ──▶ React SPA ─────┘
+               │
+               └──sign in with GitHub──▶ Neon Auth (managed Better Auth) ──▶ JWT
+
  NestJS worker ──▶ Slack Incoming Webhook, Groq/Gemini (AI)
 ```
 
 - **React + Vite (`frontend/`)** — single-page app: sign-in page, dashboard, rules UI.
-- **NestJS (`backend/`)** — OAuth, webhooks, job queue worker, GitHub/Slack/AI calls. Runs as a long-lived process, so the worker lives in-process.
-- **Same-origin cookies:** the SPA calls relative `/api/*` URLs. In dev, Vite proxies them to Nest; in production the SPA and API share one origin (decided in Session 6). Session cookies stay first-party.
+- **NestJS (`backend/`)** — JWT verification, webhooks, job queue worker, GitHub/Slack/AI calls. Runs as a long-lived process, so the worker lives in-process.
+- **Authentication — Neon Auth:** users sign in with GitHub through Neon Auth (managed Better Auth). The SPA sends the Neon Auth JWT as `Authorization: Bearer` on every `/api/*` call; Nest verifies its signature, issuer, audience and expiry against Neon Auth's JWKS. Users live in the `neon_auth` schema of our database.
+- **Repo access — GitHub App:** separate from sign-in. The App gives webhooks, installation tokens and per-repo permissions.
+- **API calls:** the SPA uses relative `/api/*` URLs. In dev, Vite proxies them to Nest; production routing is decided in Session 6.
 - **Webhooks** go straight to the API, never through the web app.
-- **Local development:** GitHub webhooks reach localhost through a [smee.io](https://smee.io) channel. GitHub App OAuth accepts a localhost callback URL.
+- **Local development:** GitHub webhooks reach localhost through a [smee.io](https://smee.io) channel. Neon Auth and GitHub App callbacks accept localhost URLs.
 - **Hosting:** to be decided later (see Session 6). The code stays host-agnostic: config comes from env vars, and nothing is tied to a specific platform.
 
 ## Stack
@@ -41,7 +46,7 @@ backend/              NestJS
     config/           zod env schema, fail fast on boot
     common/           logger (structured, redacts secrets), guards, pipes
     prisma/           PrismaService
-    auth/             GitHub OAuth, sessions, state/CSRF
+    auth/             Neon Auth JWT guard (JWKS), current-user decorator
     github/           App JWT, installation tokens, REST client
     webhooks/         signature verify, dedupe, persist, enqueue
     queue/            job claim, retry/backoff, worker loop
@@ -53,9 +58,9 @@ frontend/             React + Vite
     pages/            login, dashboard, rules, failures
     components/       app components
     components/ui/    shadcn/ui (generated)
-    lib/              api client, utils
+    lib/              Neon Auth client, api client (attaches JWT), utils
     styles/           globals.css entry + shadcn theme, components/*.css (@apply)
-docs/                 prd.md, sessions.md, commands.md, tech-stack.md, ai-log.md
+docs/                 prd.md, sessions.md, commands.md, tech-stack.md, ai-log.md, phase/
 CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 ```
 
@@ -63,8 +68,8 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 
 | Table | Key fields | Purpose |
 |---|---|---|
-| `users` | github_id, login | Signed-in users |
-| `installations` | installation_id, user_id | GitHub App installs |
+| `neon_auth.*` | managed by Neon Auth | Users, accounts (GitHub id), sessions — not in our Prisma migrations |
+| `installations` | installation_id, user_id (Neon Auth user id), github_account_id | GitHub App installs |
 | `repositories` | repo_id, full_name, installation_id | Connected repos (multi-repo) |
 | `webhook_deliveries` | **delivery_id UNIQUE**, event, payload, received_at | Dedupe + audit log |
 | `jobs` | delivery_id, status, attempts, next_run_at, last_error | Durable queue |
@@ -99,16 +104,19 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 
 **Done when:** running both apps locally, the web page shows the API health status.
 
-## Session 2 — GitHub App and sign-in
+## Session 2 — Neon Auth sign-in and GitHub App
 
 **Goal:** a user signs in and connects repositories.
 
 - [ ] Register GitHub App (permissions: issues, pull requests, metadata; events: issues, pull_request, push)
-- [ ] OAuth login with `state` validation; signed, httpOnly, secure session cookie
-- [ ] Installation callback stores installation + repositories
-- [ ] Auth guard on API; protected routes in the SPA (session check via `/api/auth/me`, redirect to login); logout
+- [ ] Enable Neon Auth on the project; add GitHub as OAuth provider with our own client ID/secret (try the GitHub App's credentials so one GitHub registration serves both)
+- [ ] Frontend: Neon Auth client, "Sign in with GitHub", session state, sign out
+- [ ] Frontend: client-side router with protected routes (redirect to login when signed out)
+- [ ] Frontend: api client attaches the JWT as a Bearer token and refreshes it on expiry (15 min tokens)
+- [ ] Backend: global auth guard verifying the JWT via Neon Auth JWKS (signature, `iss`, `aud`, `exp`); `@Public()` for health and webhooks; `@CurrentUser()`; `GET /api/me`
+- [ ] Installation callback: verify the installation's GitHub account matches the signed-in user's GitHub id (from `neon_auth`), then store installation + repositories
 
-**Done when:** sign in locally, install the App on a repo, see it listed.
+**Done when:** sign in with GitHub via Neon Auth, install the App on a repo, see it listed; `/api/*` rejects missing or forged tokens.
 
 ## Session 3 — Webhook ingestion (reliability core)
 
@@ -153,7 +161,7 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 
 - [ ] AI triage (Groq or Gemini): summary + suggested label + priority; shown in Slack and dashboard; degrades gracefully on failure
 - [ ] Hosting: pick free no-card hosts (decided at this point), deploy both apps, point GitHub App webhook + callback URLs at them
-- [ ] Security pass: no secrets in repo, client bundle, or logs; cookie flags; rate limits on public endpoints
+- [ ] Security pass: no secrets in repo, client bundle, or logs; JWT verification checks; rate limits on public endpoints
 - [ ] Final `README.md`, `.env.example`
 - [ ] `AI_NOTES.md` condensed from `docs/ai-log.md` (tools, 2–3 decisions, hardest AI wrong turn, next steps)
 - [ ] Demo repo + tester instructions
@@ -223,7 +231,7 @@ At the end of **every session**, add a short entry to `docs/ai-log.md`:
 - Prompt worth keeping (optional, short):
 ```
 
-In Session 6, `AI_NOTES.md` is condensed from this log. Likely candidates for the "hardest wrong turn": signature checks on a parsed rather than raw body, cookies failing across domains, and duplicate side effects on retry.
+In Session 6, `AI_NOTES.md` is condensed from this log. Likely candidates for the "hardest wrong turn": signature checks on a parsed rather than raw body, JWT verification gaps (issuer/audience/expiry), and duplicate side effects on retry.
 
 ### End-of-session checklist
 
