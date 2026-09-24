@@ -4,7 +4,8 @@
 
 | Concern | Choice |
 |---|---|
-| Runtime | Node.js 24 LTS (`.nvmrc`); supported: 22.12+ or 24+ |
+| Runtime | Node.js 24 LTS via nvm (`.nvmrc` → run `nvm use`); supported: 22.12+ or 24+ |
+| Package scripts | npm 11 `allowScripts` in root `package.json`: only Prisma's install scripts are approved |
 | Monorepo | npm workspaces: `backend/`, `frontend/` (no Turborepo) |
 | Hosting | Decided later — free tier, no card |
 
@@ -95,6 +96,8 @@ Next.js / SSR, state-management libraries, other UI component libraries, inline 
 - Env loaded with Node's built-in `process.loadEnvFile()`; validated once at boot, fails fast listing names only.
 - Logging: Nest `ConsoleLogger` subclass; JSON in production, secrets redacted.
 - Global route prefix `/api`.
+- Prisma: schema `prisma/schema.prisma`, config `prisma.config.ts`, client generated to `src/generated/prisma` (gitignored, ESM). Migrations use Neon's direct host (derived from the pooled `DATABASE_URL`); the app uses the pooled URL.
+- DB scripts: `db:migrate` (dev), `db:deploy` (prod), `db:status`, `db:generate`, `db:studio`.
 - Every route requires a valid Neon Auth JWT unless marked `@Public()` (health, webhooks).
 - Users are owned by Neon Auth (`neon_auth` schema); Prisma never migrates that schema.
 

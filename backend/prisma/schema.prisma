@@ -1,0 +1,136 @@
+// App tables live in the public schema. Users are owned by Neon Auth (neon_auth schema),
+// so user ids here are plain strings holding the Neon Auth user id (JWT `sub`).
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum JobStatus {
+  pending
+  running
+  succeeded
+  failed
+  dead
+}
+
+enum ActionType {
+  add_label
+  add_comment
+  slack_notify
+  ai_triage
+}
+
+enum ActionStatus {
+  pending
+  succeeded
+  failed
+  skipped
+}
+
+/// A GitHub App installation, owned by the Neon Auth user who connected it.
+model Installation {
+  id                 BigInt       @id /// GitHub installation id
+  userId             String       @map("user_id")
+  githubAccountId    BigInt       @map("github_account_id")
+  githubAccountLogin String       @map("github_account_login")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+  repositories       Repository[]
+
+  @@index([userId])
+  @@map("installations")
+}
+
+/// A repository the bot has access to through an installation.
+model Repository {
+  id             BigInt            @id /// GitHub repository id
+  installationId BigInt            @map("installation_id")
+  fullName       String            @map("full_name")
+  isPrivate      Boolean           @map("is_private")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  installation   Installation      @relation(fields: [installationId], references: [id], onDelete: Cascade)
+  rules          Rule[]
+  deliveries     WebhookDelivery[]
+
+  @@index([installationId])
+  @@map("repositories")
+}
+
+/// Every webhook received. The GitHub delivery id is the primary key, so redeliveries are ignored.
+model WebhookDelivery {
+  id           String      @id /// X-GitHub-Delivery
+  event        String
+  action       String?
+  repositoryId BigInt?     @map("repository_id")
+  payload      Json
+  receivedAt   DateTime    @default(now()) @map("received_at")
+  repository   Repository? @relation(fields: [repositoryId], references: [id], onDelete: SetNull)
+  job          Job?
+  actions      Action[]
+
+  @@index([repositoryId, receivedAt])
+  @@map("webhook_deliveries")
+}
+
+/// Durable queue: one job per delivery, claimed with FOR UPDATE SKIP LOCKED.
+model Job {
+  id         String          @id @default(uuid()) @db.Uuid
+  deliveryId String          @unique @map("delivery_id")
+  status     JobStatus       @default(pending)
+  attempts   Int             @default(0)
+  nextRunAt  DateTime        @default(now()) @map("next_run_at")
+  lockedAt   DateTime?       @map("locked_at")
+  lastError  String?         @map("last_error")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
+  delivery   WebhookDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextRunAt])
+  @@map("jobs")
+}
+
+/// A user-configured rule: when an event matches the conditions, run the actions.
+model Rule {
+  id           String     @id @default(uuid()) @db.Uuid
+  repositoryId BigInt     @map("repository_id")
+  userId       String     @map("user_id")
+  name         String
+  event        String
+  conditions   Json
+  actions      Json
+  enabled      Boolean    @default(true)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  results      Action[]
+
+  @@index([repositoryId, event, enabled])
+  @@map("rules")
+}
+
+/// One side effect per (delivery, rule, type). The unique key makes retries idempotent.
+model Action {
+  id         String          @id @default(uuid()) @db.Uuid
+  deliveryId String          @map("delivery_id")
+  ruleId     String          @map("rule_id") @db.Uuid
+  type       ActionType
+  status     ActionStatus    @default(pending)
+  attempts   Int             @default(0)
+  result     Json?
+  error      String?
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
+  delivery   WebhookDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  rule       Rule            @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@unique([deliveryId, ruleId, type])
+  @@index([status])
+  @@map("actions")
+}

@@ -25,3 +25,6 @@ npm-debug.log*
 # Hosting and local tool state
 .vercel/
 .claude/settings.local.json
+
+# Generated Prisma client
+backend/src/generated/

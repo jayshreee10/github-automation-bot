@@ -16,3 +16,5 @@
 | 2026-09-24 | Phase 1 plan: authentication with Neon Auth (manual setup steps + build plan) | `docs/phase/phase-1.md` |
 | 2026-09-24 | Phase 1 backend: global Neon Auth JWT guard (JWKS, EdDSA, issuer, expiry), `@Public()`, `@CurrentUser()`, `GET /api/me`, public `GET /api/health` | `backend/src/auth/*`, `backend/src/health/*`, `backend/src/config/env.ts`, `backend/.env.example` |
 | 2026-09-24 | Phase 1 frontend: Neon Auth client (`@neondatabase/auth`), GitHub sign-in, protected routes (`react-router`), JWT api client, zod env + response parsing, dashboard `/api/me` | `frontend/src/lib/*`, `frontend/src/pages/*`, `frontend/src/components/protected-route.tsx`, `frontend/src/router.tsx`, `frontend/src/styles/components/auth.css`, `frontend/.env.example` |
+| 2026-09-24 | Workspace restored after root `package.json` deletion; reinstalled on Node 24; npm `allowScripts` reviewed | `package.json`, `package-lock.json` |
+| 2026-09-24 | Prisma 7.10 schema (6 tables, 3 enums), config with direct-host migrations, `init` migration applied to Neon, `db:*` scripts | `backend/prisma/*`, `backend/prisma.config.ts`, `backend/package.json`, `.gitignore` |
