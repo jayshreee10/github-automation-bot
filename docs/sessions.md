@@ -16,14 +16,14 @@ Tech stack: [`tech-stack.md`](tech-stack.md)
    │  label / comment   │   │ /api/* proxied
    └────────────────────┘   │
                             │
- Browser ──▶ Next.js web ─────rewrites──┘
+ Browser ──▶ React SPA ──/api proxy──────┘
                             │
  NestJS worker ──▶ Slack Incoming Webhook, Groq/Gemini (AI)
 ```
 
-- **Next.js (`frontend/`)** — sign-in page, dashboard, rules UI.
+- **React + Vite (`frontend/`)** — single-page app: sign-in page, dashboard, rules UI.
 - **NestJS (`backend/`)** — OAuth, webhooks, job queue worker, GitHub/Slack/AI calls. Runs as a long-lived process, so the worker lives in-process.
-- **Same-origin cookies:** Next.js rewrites `/api/*` to the Nest API, so the browser only sees the web domain. Session cookies stay first-party.
+- **Same-origin cookies:** the SPA calls relative `/api/*` URLs. In dev, Vite proxies them to Nest; in production the SPA and API share one origin (decided in Session 6). Session cookies stay first-party.
 - **Webhooks** go straight to the API, never through the web app.
 - **Local development:** GitHub webhooks reach localhost through a [smee.io](https://smee.io) channel. GitHub App OAuth accepts a localhost callback URL.
 - **Hosting:** to be decided later (see Session 6). The code stays host-agnostic: config comes from env vars, and nothing is tied to a specific platform.
@@ -48,11 +48,13 @@ backend/              NestJS
     rules/            rule CRUD + pure matcher
     actions/          label, comment, slack, ai-triage
     dashboard/        read APIs for events, actions, failures
-frontend/             Next.js
-  pages/              index (login), dashboard, rules, failures
-  components/         shared UI pieces
-  styles/             globals.css entry, base.css, components/*.css (@apply)
-  lib/                api client
+frontend/             React + Vite
+  src/
+    pages/            login, dashboard, rules, failures
+    components/       app components
+    components/ui/    shadcn/ui (generated)
+    lib/              api client, utils
+    styles/           globals.css entry + shadcn theme, components/*.css (@apply)
 docs/                 prd.md, sessions.md, commands.md, tech-stack.md, ai-log.md
 CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 ```
@@ -75,9 +77,9 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 
 **Goal:** a running local skeleton connected to Neon.
 
-- [ ] `git init`, npm workspaces, `backend/` (Nest) and `frontend/` (Next); strip test tooling (Vitest in Nest 12) and spec files from the Nest scaffold
+- [ ] `git init`, npm workspaces, `backend/` (Nest) and `frontend/` (React + Vite); strip test tooling (Vitest in Nest 12) and spec files from the Nest scaffold
 - [ ] `CLAUDE.md`, `AGENTS.md`, `.env.example`
-- [ ] Root `.gitignore` written **before the first commit**: `node_modules/`, `.env*` (keep `.env.example`), `.next/`, `dist/`, `out/`, `coverage/`, `*.log`, `.DS_Store`, `.vscode/`, `.idea/`, `*.pem` (GitHub App private key), `*.tsbuildinfo`, `.vercel/`
+- [ ] Root `.gitignore` written **before the first commit**: `node_modules/`, `.env*` (keep `.env.example`), `dist/`, `out/`, `coverage/`, `*.log`, `.DS_Store`, `.vscode/`, `.idea/`, `*.pem` (GitHub App private key), `*.tsbuildinfo`, `.vercel/`
 - [ ] Verify with `git status` that only source, config and docs are staged
 - [ ] zod env validation, structured logger with secret redaction
 - [ ] Neon setup (project `github-automation-bot`, ID `winter-cloud-00013821`, branch `production`):
@@ -91,8 +93,9 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
   8. Put the connection string (Console → **Connect**) in `backend/.env` as `DATABASE_URL`; never commit or paste it
   9. Review files the CLI created; gitignore any local/credential files before committing
 - [ ] Prisma + Neon, first migration with all tables
-- [ ] `GET /api/health` (checks DB), Next.js landing page
-- [ ] Next.js rewrites `/api/*` → Nest API
+- [ ] Switch frontend to React + Vite + Tailwind + shadcn/ui
+- [ ] `GET /api/health` (checks DB), landing page shows health status
+- [ ] Vite dev proxy `/api/*` → Nest API
 
 **Done when:** running both apps locally, the web page shows the API health status.
 
@@ -103,7 +106,7 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 - [ ] Register GitHub App (permissions: issues, pull requests, metadata; events: issues, pull_request, push)
 - [ ] OAuth login with `state` validation; signed, httpOnly, secure session cookie
 - [ ] Installation callback stores installation + repositories
-- [ ] Auth guard on API; protected pages via `getServerSideProps` session check (redirect to login); logout
+- [ ] Auth guard on API; protected routes in the SPA (session check via `/api/auth/me`, redirect to login); logout
 
 **Done when:** sign in locally, install the App on a repo, see it listed.
 

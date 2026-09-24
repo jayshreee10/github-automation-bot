@@ -8,12 +8,10 @@ node_modules/
 *.pem
 
 # Build output
-.next/
 dist/
 out/
 coverage/
 *.tsbuildinfo
-next-env.d.ts
 
 # Logs
 *.log

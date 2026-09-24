@@ -23,7 +23,7 @@ Custom Claude Code slash commands for working through [`sessions.md`](sessions.m
 | Command | Example | What it does |
 |---|---|---|
 | `/commit [hint]` | `/commit webhook signature check` | Checks for ignored or secret files, stages relevant files by name, proposes a conventional commit message. Never pushes. |
-| `/check-secrets` | `/check-secrets` | Scans for leaked tokens, keys and `.env` files, secrets exposed to the Next.js client, and missing log redaction. Read-only. |
+| `/check-secrets` | `/check-secrets` | Scans for leaked tokens, keys and `.env` files, secrets exposed to the React client, and missing log redaction. Read-only. |
 | `/issue <description>` | `/issue duplicate Slack message when webhook is redelivered` | Finds the session that owns the affected code, logs the issue, finds the root cause, proposes a fix (applied after approval), and records it in that session's `issues.md`, `root-cause.md` and `fixes.md`. |
 | `/log <n> <type> <text>` | `/log 3 issue webhook rejected valid signature` | Adds a dated row to `.claude/sessions/session-n/` — type is `summary`, `issue`, `root-cause` or `fix`. |
 | `/log-ai <note>` | `/log-ai AI verified the signature on parsed JSON instead of the raw body` | Adds a note to `docs/ai-log.md` under the current session. |

@@ -10,3 +10,5 @@
 | 2026-09-24 | Zod env validation, fail fast (names only), built-in `.env` loading | `backend/src/config/*`, `backend/.env.example` |
 | 2026-09-24 | Logger: JSON in prod, secret redaction on every message | `backend/src/common/logger/*`, `backend/src/main.ts` |
 | 2026-09-24 | Tailwind v4; styles in `styles/` via `@apply`, no inline utilities | `frontend/styles/*`, `frontend/postcss.config.mjs`, `frontend/pages/*` |
+| 2026-09-24 | Frontend switched from Next.js to React + Vite + Tailwind v4 + shadcn/ui; Vite `/api` dev proxy | `frontend/*` |
+| 2026-09-24 | Docs updated for React + Vite; tech stack split frontend/backend | `docs/tech-stack.md`, `docs/sessions.md`, `docs/commands.md`, `.claude/commands/check-secrets.md` |

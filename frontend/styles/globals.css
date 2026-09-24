@@ -1,4 +1,0 @@
-/* Single CSS entry (Pages Router allows global CSS only in _app). Add new component files below. */
-@import "tailwindcss";
-@import "./base.css";
-@import "./components/layout.css";
