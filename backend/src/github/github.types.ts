@@ -38,6 +38,12 @@ export const hookDeliverySchema = z.object({
   event: z.string(),
 });
 
+// App webhook settings. The secret comes back masked; the URL is never sent to the browser.
+export const hookConfigSchema = z.object({
+  url: z.string().nullish(),
+  content_type: z.string().nullish(),
+});
+
 export type GithubHookDelivery = z.infer<typeof hookDeliverySchema>;
 export type GithubInstallation = z.infer<typeof githubInstallationSchema>;
 export type GithubRepository = z.infer<typeof githubRepositorySchema>;

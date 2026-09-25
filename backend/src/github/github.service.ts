@@ -9,6 +9,7 @@ import { GithubAppService } from './github-app.service.js';
 import {
   type GithubHookDelivery,
   type GithubInstallation,
+  hookConfigSchema,
   hookDeliverySchema,
   type GithubRepository,
   githubInstallationSchema,
@@ -81,5 +82,15 @@ export class GithubService {
       await this.app.appJwt(),
       { method: 'POST' },
     );
+  }
+
+  // True when the App has a webhook URL set. GitHub only sends events to Apps with an active webhook.
+  async hookConfigured(): Promise<boolean> {
+    const config = await githubFetch(
+      '/app/hook/config',
+      await this.app.appJwt(),
+      hookConfigSchema,
+    );
+    return Boolean(config.url);
   }
 }
