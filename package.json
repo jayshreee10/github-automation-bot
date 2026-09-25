@@ -9,6 +9,7 @@
     "node": ">=22.12 <23 || >=24"
   },
   "scripts": {
+    "start": "concurrently -k -n be,fe -c blue,magenta \"npm:dev:backend\" \"npm:dev:frontend\"",
     "dev:backend": "npm run start:dev -w backend",
     "dev:frontend": "npm run dev -w frontend",
     "build": "npm run build --workspaces",
@@ -17,7 +18,11 @@
   "allowScripts": {
     "@prisma/engines@7.10.0": true,
     "prisma@7.10.0": true,
+    "@scarf/scarf": false,
     "core-js": false,
     "fsevents": false
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
   }
 }

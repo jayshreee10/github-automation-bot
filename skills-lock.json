@@ -7,6 +7,12 @@
       "skillPath": "better-auth/best-practices/SKILL.md",
       "computedHash": "0c30be0e118c2b7a0c4c57bd9e63bf110c7e420a79ec6ce7997153f3b1e066ee"
     },
+    "clean-architecture": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "clean-architecture/SKILL.md",
+      "computedHash": "91e3c122b6951e485b4eca773472708fc08b9bbb68247aa9c75c975df380630c"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
@@ -18,6 +24,12 @@
       "sourceType": "github",
       "skillPath": "skills/neon-postgres/SKILL.md",
       "computedHash": "b9763d379a3c5039e5555540a1333b1c529e2365d4f0b8fe2998ba41509814c5"
+    },
+    "nestjs-best-practices": {
+      "source": "kadajett/agent-nestjs-skills",
+      "sourceType": "github",
+      "skillPath": "skills/nestjs-best-practices/SKILL.md",
+      "computedHash": "58f8a630637be3acce1f118c747d68160346ada8a43d76cb52a5b4c4edaa2d37"
     },
     "prisma-cli": {
       "source": "prisma/skills",
@@ -36,6 +48,30 @@
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
       "computedHash": "f615de216e085a84e31593ad0fa9062232adc40cd87b7c7ab2b8e49abf6500be"
+    },
+    "stitch::react-components": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/stitch-build/skills/react-components/SKILL.md",
+      "computedHash": "e4f9aaccf174f414274873cbeeee1bb6fa8833ae50457246d670872b0c3e063a"
+    },
+    "tailwind-design-system": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/frontend-mobile-development/skills/tailwind-design-system/SKILL.md",
+      "computedHash": "cd61afd28f594e8b6712b61749209cbb4466e3eec4e4223793bbd97fc85c1b63"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "computedHash": "3219a1944e404ffc14d1d9d6aef6dd2e3855b81387ee0a044ccbfe14d34c2357"
+    },
+    "zustand": {
+      "source": "lobehub/lobehub",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/zustand/SKILL.md",
+      "computedHash": "663fbdb4f16955398f46456637aca329a9c0d65c3eba1c91bb46811064aec0cb"
     }
   }
 }

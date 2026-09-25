@@ -1,5 +1,9 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(npx skills add *)",
+      "Bash(npx -y skills add *)"
+    ],
     "ask": [
       "Bash(git push)",
       "Bash(git push *)",
