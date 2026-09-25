@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
+import { EventLog } from '@/components/event-log'
 import { RepositoryList } from '@/components/repository-list'
 import { Button } from '@/components/ui/button'
 import { apiFetch } from '@/lib/api'
@@ -37,6 +38,7 @@ export function DashboardPage() {
         </p>
       )}
       {error && <p className="error-text">{error}</p>}
+      <EventLog />
       <RepositoryList />
     </main>
   )

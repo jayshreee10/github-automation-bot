@@ -1,0 +1,79 @@
+@layer components {
+  .events-section {
+    @apply mt-8 flex flex-col gap-4;
+  }
+
+  .events-header {
+    @apply flex flex-wrap items-center justify-between gap-3;
+  }
+
+  .webhook-status {
+    @apply inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium;
+  }
+
+  .webhook-dot {
+    @apply size-2 rounded-full bg-muted-foreground;
+  }
+
+  .webhook-status[data-state='connected'] .webhook-dot {
+    @apply bg-emerald-500;
+  }
+
+  .webhook-status[data-state='waiting'] .webhook-dot {
+    @apply bg-amber-500;
+  }
+
+  .webhook-status[data-state='off'] .webhook-dot {
+    @apply bg-destructive;
+  }
+
+  .event-list {
+    @apply divide-y rounded-xl border bg-card text-card-foreground;
+  }
+
+  .event-item {
+    @apply flex flex-col gap-1 px-4 py-3;
+  }
+
+  .event-row {
+    @apply flex items-center justify-between gap-4;
+  }
+
+  .event-main {
+    @apply flex min-w-0 items-center gap-2;
+  }
+
+  .event-type {
+    @apply shrink-0 rounded-md bg-muted px-2 py-0.5 font-mono text-xs;
+  }
+
+  .event-title {
+    @apply truncate text-sm font-medium hover:underline;
+  }
+
+  .event-meta {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .event-status {
+    @apply shrink-0 rounded-md border px-2 py-0.5 text-xs;
+  }
+
+  .event-status[data-status='succeeded'] {
+    @apply border-emerald-500/40 text-emerald-600 dark:text-emerald-400;
+  }
+
+  .event-status[data-status='failed'],
+  .event-status[data-status='running'],
+  .event-status[data-status='pending'] {
+    @apply border-amber-500/40 text-amber-600 dark:text-amber-400;
+  }
+
+  .event-status[data-status='dead'] {
+    @apply border-destructive/40 text-destructive;
+  }
+
+  .event-error {
+    @apply truncate font-mono text-xs text-destructive;
+  }
+}
