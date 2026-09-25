@@ -115,6 +115,29 @@ export class InstallationsService {
     }
   }
 
+  // Webhook-triggered re-sync, acting as the stored owner. Unknown installations are ignored, never created.
+  async syncKnown(installationId: number): Promise<boolean> {
+    const owner = await this.prisma.installation.findUnique({
+      where: { id: BigInt(installationId) },
+      select: { userId: true },
+    });
+    if (!owner) return false;
+    await this.sync(
+      { id: owner.userId, email: null, name: null },
+      installationId,
+    );
+    return true;
+  }
+
+  // Webhook-triggered removal (App uninstalled). Repos cascade; unknown ids are a no-op.
+  async removeKnown(installationId: number): Promise<boolean> {
+    const { count } = await this.prisma.installation.deleteMany({
+      where: { id: BigInt(installationId) },
+    });
+    this.tokens.forget(installationId);
+    return count > 0;
+  }
+
   // Installations are returned separately so one with zero repos still shows Sync / Manage in the UI.
   async list(user: AuthUser): Promise<RepositoryList> {
     const installations = await this.prisma.installation.findMany({

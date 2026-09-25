@@ -14,9 +14,17 @@ const SENSITIVE_PATTERNS: RegExp[] = [
 // Masks credentials in URLs like postgres://user:pass@host, keeping user and host visible.
 const URL_PASSWORD = /(\b[a-z][a-z0-9+.-]*:\/\/[^:/\s]+:)[^@\s]+@/gi;
 
+// Exact secret values registered at boot (e.g. the webhook secret), masked wherever they appear.
+const EXACT_SECRETS = new Set<string>();
+
+export function redactExact(secret: string): void {
+  if (secret.length >= 8) EXACT_SECRETS.add(secret);
+}
+
 function redactString(value: string): string {
   let out = value.replace(URL_PASSWORD, `$1${MASK}@`);
   for (const pattern of SENSITIVE_PATTERNS) out = out.replace(pattern, MASK);
+  for (const secret of EXACT_SECRETS) out = out.replaceAll(secret, MASK);
   return out;
 }
 
