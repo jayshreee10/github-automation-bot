@@ -5,7 +5,7 @@ How this project is built, one session at a time. Each session ends with working
 Source spec: [`prd.md`](prd.md)
 Workflow commands: [`commands.md`](commands.md)
 Tech stack: [`tech-stack.md`](tech-stack.md)
-Phase plans: [`phase/`](phase/) — [phase 1: authentication](phase/phase-1.md)
+Phase plans: [`phase/`](phase/) — [phase 1: authentication](phase/phase-1.md) · [phase 2: GitHub App and repos](phase/phase-2.md) · [phase 3: webhooks and queue](phase/phase-3.md) · [phase 4: rules and actions](phase/phase-4.md) · [phase 5: dashboard and observability](phase/phase-5.md)
 
 ---
 
@@ -21,11 +21,11 @@ Phase plans: [`phase/`](phase/) — [phase 1: authentication](phase/phase-1.md)
                │
                └──sign in with GitHub──▶ Neon Auth (managed Better Auth) ──▶ JWT
 
- NestJS worker ──▶ Slack Incoming Webhook, Groq/Gemini (AI)
+ NestJS worker ──▶ Slack Incoming Webhook  (Groq/Gemini AI: later, Session 7)
 ```
 
 - **React + Vite (`frontend/`)** — single-page app: sign-in page, dashboard, rules UI.
-- **NestJS (`backend/`)** — JWT verification, webhooks, job queue worker, GitHub/Slack/AI calls. Runs as a long-lived process, so the worker lives in-process.
+- **NestJS (`backend/`)** — JWT verification, webhooks, job queue worker, GitHub/Slack calls (AI calls come later, Session 7). Runs as a long-lived process, so the worker lives in-process.
 - **Authentication — Neon Auth:** users sign in with GitHub through Neon Auth (managed Better Auth). The SPA sends the Neon Auth JWT as `Authorization: Bearer` on every `/api/*` call; Nest verifies its signature, issuer, audience and expiry against Neon Auth's JWKS. Users live in the `neon_auth` schema of our database.
 - **Repo access — GitHub App:** separate from sign-in. The App gives webhooks, installation tokens and per-repo permissions.
 - **API calls:** the SPA uses relative `/api/*` URLs. In dev, Vite proxies them to Nest; production routing is decided in Session 6.
@@ -51,7 +51,7 @@ backend/              NestJS
     webhooks/         signature verify, dedupe, persist, enqueue
     queue/            job claim, retry/backoff, worker loop
     rules/            rule CRUD + pure matcher
-    actions/          label, comment, slack, ai-triage
+    actions/          label, comment, slack (ai-triage later, Session 7)
     dashboard/        read APIs for events, actions, failures
 frontend/             React + Vite
   src/
@@ -75,6 +75,22 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 | `jobs` | delivery_id, status, attempts, next_run_at, last_error | Durable queue |
 | `rules` | repo_id, event, conditions (json), actions (json), enabled | User-configured rules |
 | `actions` | **UNIQUE(delivery_id, rule_id, type)**, status, result | Idempotent side effects log |
+
+## Test repository
+
+End-to-end checks run against **[jayshreee10/test-bot](https://github.com/jayshreee10/test-bot)** with the `gh` CLI, once a session's implementation is done. The App must be installed on it (phase 2 flow).
+
+| Trigger | Command |
+|---|---|
+| Open an issue | `gh issue create -R jayshreee10/test-bot --title "bug: <text>" --body "<text>"` |
+| Close / reopen an issue | `gh issue close <n> -R jayshreee10/test-bot` · `gh issue reopen <n> -R jayshreee10/test-bot` |
+| Push a commit | Clone into the scratchpad, commit, `git push` to a test branch |
+| Open a PR | `gh pr create -R jayshreee10/test-bot --head <test-branch> --title "<text>" --body "<text>"` |
+| Check the bot's result | `gh issue view <n> -R jayshreee10/test-bot --json labels,comments` |
+
+- Only this repo is used for test traffic; never test against real project repos.
+- Pushes to `test-bot` are test fixtures only. The "no `git push` without approval" rule for this project's repo still applies.
+- Clean up with `gh issue close` / `gh pr close --delete-branch` after each run.
 
 ---
 
@@ -129,7 +145,7 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 - [ ] Boot catch-up: list failed deliveries via App API and request redelivery (covers downtime and free-tier sleep)
 - [ ] Handle `issues`, `pull_request`, `push`
 
-**Done when:** a forged request is rejected, a redelivered event is ignored, and a killed worker resumes pending jobs.
+**Done when:** a forged request is rejected, a redelivered event is ignored, and a killed worker resumes pending jobs. Verified with `gh` against the [test repository](#test-repository).
 
 ## Session 4 — Rules and actions
 
@@ -155,19 +171,28 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 
 **Done when:** every event and failure from Sessions 3–4 is visible and retryable in the UI.
 
-## Session 6 — AI triage, hosting, deliverables
+## Session 6 — Hosting and deliverables
 
-**Goal:** stretch AI step, a public deployment, and a submission-ready repo.
+**Goal:** a public deployment and a submission-ready repo.
 
-- [ ] AI triage (Groq or Gemini): summary + suggested label + priority; shown in Slack and dashboard; degrades gracefully on failure
 - [ ] Hosting: pick free no-card hosts (decided at this point), deploy both apps, point GitHub App webhook + callback URLs at them
 - [ ] Security pass: no secrets in repo, client bundle, or logs; JWT verification checks; rate limits on public endpoints
 - [ ] Final `README.md`, `.env.example`
 - [ ] `AI_NOTES.md` condensed from `docs/ai-log.md` (tools, 2–3 decisions, hardest AI wrong turn, next steps)
-- [ ] Demo repo + tester instructions
+- [ ] Demo repo (`jayshreee10/test-bot`, see [Test repository](#test-repository)) + tester instructions
 - [ ] Full end-to-end run on live URLs
 
 **Done when:** a fresh reviewer can follow the README and see the full flow work.
+
+## Session 7 — AI triage (later)
+
+**Deferred:** not built for now; picked up after the core flow is deployed. The app must work fully without it.
+
+- [ ] AI triage (Groq or Gemini): summary + suggested label + priority; shown in Slack and dashboard; degrades gracefully on failure
+- [ ] Env var for the AI key (optional; feature off when unset)
+- [ ] Redeploy and re-run the end-to-end check
+
+**Done when:** a new issue gets a summary, label suggestion and priority in Slack and the dashboard, and an AI outage never blocks other actions.
 
 ---
 
@@ -195,7 +220,7 @@ CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
 | Core 6 — dashboard behind login | 5 |
 | Core 7 — README | 6 |
 | Stretch 1 — configurable rules UI | 4, 5 |
-| Stretch 2 — AI step | 6 |
+| Stretch 2 — AI step | 7 (later) |
 | Stretch 3 — GitHub App auth | 2, 4 |
 | Stretch 4 — multi-repo | 2, 5 |
 | Stretch 5 — observability | 3, 5 |

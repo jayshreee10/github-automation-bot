@@ -5,7 +5,7 @@
 | Concern | Choice |
 |---|---|
 | Runtime | Node.js 24 LTS via nvm (`.nvmrc` → run `nvm use`); supported: 22.12+ or 24+ |
-| Package scripts | npm 11 `allowScripts` in root `package.json`: only Prisma's install scripts are approved |
+| Package scripts | npm 11 `allowScripts` in root `package.json`: only Prisma's install scripts are approved; `@scarf/scarf` (Swagger UI telemetry) is denied |
 | Monorepo | npm workspaces: `backend/`, `frontend/` (no Turborepo) |
 | Hosting | Decided later — free tier, no card |
 
@@ -23,6 +23,7 @@
 | Styling | Tailwind CSS v4 (`@tailwindcss/vite`) |
 | Components | shadcn/ui (Radix base, Nova preset, Lucide icons) |
 | Auth | Neon Auth client `@neondatabase/auth` + `BetterAuthReactAdapter` — GitHub sign-in, session, JWT |
+| State management | Zustand — client/UI state only; server data comes from `/api/*`, auth from the Neon Auth SDK |
 | Routing | `react-router` (data router, protected routes) |
 | API access | Relative `/api/*` calls with `Authorization: Bearer <Neon Auth JWT>`; Vite dev proxy to the backend |
 | Validation | zod (`VITE_*` env, API responses, form input) |
@@ -43,6 +44,7 @@
 | `zod` | 4 (same major as backend) |
 | `@neondatabase/auth` | 0.5 (beta) |
 | `react-router` | 8 |
+| `zustand` | 5 |
 
 ### Conventions
 
@@ -54,10 +56,11 @@
 - Validate `import.meta.env` once at startup and parse every `/api/*` response with a zod schema; frontend schemas live in `frontend/` (no shared package).
 - Only `VITE_*` env vars are bundled into the browser; never put secrets in them.
 - Auth tokens are never stored in `localStorage` by app code; the Neon Auth SDK owns the session.
+- Zustand stores live in `src/stores/`, one per concern. Read with selectors, keep actions inside the store, never copy auth/session into a store.
 
 ### Excluded
 
-Next.js / SSR, state-management libraries, other UI component libraries, inline Tailwind utilities in app JSX.
+Next.js / SSR, state-management libraries other than Zustand (Redux, MobX, Jotai), other UI component libraries, inline Tailwind utilities in app JSX.
 
 ---
 
@@ -72,11 +75,12 @@ Next.js / SSR, state-management libraries, other UI component libraries, inline 
 | Database | Neon Postgres |
 | ORM / migrations | Prisma |
 | Validation | zod (env + request bodies) |
+| API docs | Swagger via `@nestjs/swagger` — response schemas read straight from zod (Standard Schema), no DTO classes |
 | Auth | Verifies Neon Auth JWTs against its JWKS with `jose` (EdDSA only, `iss`, `exp`) |
 | Scheduling | `@nestjs/schedule` for the worker poll loop |
 | GitHub | GitHub App (repo access, webhooks) — built-in `fetch` + `crypto` for App JWT |
 | Notifications | Slack Incoming Webhook |
-| AI | Groq or Gemini free tier via `fetch` |
+| AI | Later (Session 7): Groq or Gemini free tier via `fetch` — not used for now |
 | Local webhooks | [smee.io](https://smee.io) channel to localhost |
 | Linting / format | `oxlint`, `prettier` |
 
@@ -88,6 +92,7 @@ Next.js / SSR, state-management libraries, other UI component libraries, inline 
 | `typescript` | 6 |
 | `zod` | 4 |
 | `jose` | 6 |
+| `@nestjs/swagger` | 12 |
 | `prisma`, `@prisma/client` | 7.10.0 (pinned stable; npm `latest` is an 8.0 RC) |
 | `oxlint`, `prettier` | 1, 3 |
 
@@ -96,6 +101,7 @@ Next.js / SSR, state-management libraries, other UI component libraries, inline 
 - Env loaded with Node's built-in `process.loadEnvFile()`; validated once at boot, fails fast listing names only.
 - Logging: Nest `ConsoleLogger` subclass; JSON in production, secrets redacted.
 - Global route prefix `/api`.
+- Swagger UI at `/api/docs`, spec at `/api/docs-json`; dev only (off when `NODE_ENV=production`). Document responses with `@ApiOkResponse({ standardSchema: zodSchema })`; protected controllers add `@ApiBearerAuth()`.
 - Prisma: schema `prisma/schema.prisma`, config `prisma.config.ts`, client generated to `src/generated/prisma` (gitignored, ESM). Migrations use Neon's direct host (derived from the pooled `DATABASE_URL`); the app uses the pooled URL.
 - DB scripts: `db:migrate` (dev), `db:deploy` (prod), `db:status`, `db:generate`, `db:studio`.
 - Every route requires a valid Neon Auth JWT unless marked `@Public()` (health, webhooks).
@@ -103,4 +109,4 @@ Next.js / SSR, state-management libraries, other UI component libraries, inline 
 
 ### Excluded
 
-Automated tests (Jest / Vitest), Redis/BullMQ, Docker, websockets, Octokit, `dotenv`, hand-rolled OAuth/session handling (Neon Auth owns it).
+Automated tests (Jest / Vitest), `class-validator` / `class-transformer`, Redis/BullMQ, Docker, websockets, Octokit, `dotenv`, hand-rolled OAuth/session handling (Neon Auth owns it).
