@@ -7,9 +7,10 @@ export function ProtectedRoute() {
 
   if (isPending) return <p className="screen-message">Loading…</p>
   if (!data) {
-    // Keep path + query (e.g. the GitHub setup callback) so sign-in can return to it.
-    const next = encodeURIComponent(location.pathname + location.search)
-    return <Navigate to={`/login?next=${next}`} replace />
+    // Keep path + query (e.g. the GitHub setup callback) so sign-in can return to it. "/" is the default, so omit it.
+    const target = location.pathname + location.search
+    const to = target === '/' ? '/login' : `/login?next=${encodeURIComponent(target)}`
+    return <Navigate to={to} replace />
   }
   return <Outlet />
 }
