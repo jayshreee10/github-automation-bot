@@ -1,21 +1,24 @@
 import { useState } from 'react'
-import { Navigate } from 'react-router'
+import { Navigate, useSearchParams } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
+import { safeNextPath } from '@/lib/redirect'
 
 export function LoginPage() {
   const { data, isPending } = authClient.useSession()
   const [error, setError] = useState<string | null>(null)
+  const [params] = useSearchParams()
+  const next = safeNextPath(params.get('next'))
 
   if (isPending) return <p className="screen-message">Loading…</p>
-  if (data) return <Navigate to="/" replace />
+  if (data) return <Navigate to={next} replace />
 
   // callbackURL must be absolute and listed in Neon Auth trusted domains.
   async function signIn() {
     setError(null)
     const { error } = await authClient.signIn.social({
       provider: 'github',
-      callbackURL: `${window.location.origin}/`,
+      callbackURL: `${window.location.origin}${next}`,
     })
     if (error) setError('Sign-in failed. Please try again.')
   }

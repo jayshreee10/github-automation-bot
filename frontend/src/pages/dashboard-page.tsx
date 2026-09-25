@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
+import { RepositoryList } from '@/components/repository-list'
 import { Button } from '@/components/ui/button'
 import { apiFetch } from '@/lib/api'
 import { authClient } from '@/lib/auth-client'
@@ -36,6 +37,7 @@ export function DashboardPage() {
         </p>
       )}
       {error && <p className="error-text">{error}</p>}
+      <RepositoryList />
     </main>
   )
 }

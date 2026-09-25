@@ -1,0 +1,61 @@
+@layer components {
+  .repo-section {
+    @apply mt-8 flex flex-col gap-4;
+  }
+
+  .repo-header {
+    @apply flex items-center justify-between gap-4;
+  }
+
+  .section-title {
+    @apply font-heading text-lg font-semibold tracking-tight;
+  }
+
+  .repo-group {
+    @apply rounded-xl border bg-card text-card-foreground;
+  }
+
+  .repo-group-header {
+    @apply flex items-center justify-between gap-4 border-b px-4 py-3;
+  }
+
+  .repo-group-actions {
+    @apply flex items-center gap-2;
+  }
+
+  .repo-account {
+    @apply text-sm font-medium;
+  }
+
+  .repo-list {
+    @apply divide-y;
+  }
+
+  .repo-item {
+    @apply flex items-center justify-between gap-4 px-4 py-3;
+  }
+
+  .repo-name {
+    @apply text-sm font-medium hover:underline;
+  }
+
+  .repo-empty {
+    @apply px-4 py-3 text-sm text-muted-foreground;
+  }
+
+  .repo-badge {
+    @apply rounded-md border px-2 py-0.5 text-xs text-muted-foreground;
+  }
+
+  .muted-text {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .setup-card {
+    @apply flex w-full max-w-sm flex-col items-center gap-4 rounded-xl border bg-card p-8 text-center text-card-foreground shadow-sm;
+  }
+
+  .setup-link {
+    @apply text-sm underline underline-offset-4;
+  }
+}
