@@ -2,9 +2,9 @@ import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
-import { AppLogger } from './common/logger/app-logger.js';
-import { loadEnv } from './config/env.js';
-import { setupSwagger } from './swagger.js';
+import { AppLogger } from './core/logger/app-logger.js';
+import { loadEnv } from './core/config/env.js';
+import { setupSwagger } from './core/swagger.js';
 
 async function bootstrap() {
   const env = loadEnv();
