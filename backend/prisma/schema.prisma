@@ -36,13 +36,15 @@ enum ActionStatus {
 
 /// A GitHub App installation, owned by the Neon Auth user who connected it.
 model Installation {
-  id                 BigInt       @id /// GitHub installation id
-  userId             String       @map("user_id")
-  githubAccountId    BigInt       @map("github_account_id")
-  githubAccountLogin String       @map("github_account_login")
-  createdAt          DateTime     @default(now()) @map("created_at")
-  updatedAt          DateTime     @updatedAt @map("updated_at")
-  repositories       Repository[]
+  id                  BigInt       @id /// GitHub installation id
+  userId              String       @map("user_id")
+  githubAccountId     BigInt       @map("github_account_id")
+  githubAccountLogin  String       @map("github_account_login")
+  accountType         String?      @map("account_type") /// User or Organization
+  repositorySelection String?      @map("repository_selection") /// all or selected
+  createdAt           DateTime     @default(now()) @map("created_at")
+  updatedAt           DateTime     @updatedAt @map("updated_at")
+  repositories        Repository[]
 
   @@index([userId])
   @@map("installations")
@@ -54,6 +56,7 @@ model Repository {
   installationId BigInt            @map("installation_id")
   fullName       String            @map("full_name")
   isPrivate      Boolean           @map("is_private")
+  defaultBranch  String?           @map("default_branch")
   createdAt      DateTime          @default(now()) @map("created_at")
   installation   Installation      @relation(fields: [installationId], references: [id], onDelete: Cascade)
   rules          Rule[]
@@ -125,6 +128,7 @@ model Action {
   attempts   Int             @default(0)
   result     Json?
   error      String?
+  durationMs Int?            @map("duration_ms") /// Last attempt's run time
   createdAt  DateTime        @default(now()) @map("created_at")
   updatedAt  DateTime        @updatedAt @map("updated_at")
   delivery   WebhookDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
@@ -132,5 +136,15 @@ model Action {
 
   @@unique([deliveryId, ruleId, type])
   @@index([status])
+  @@index([ruleId, createdAt])
   @@map("actions")
+}
+
+/// Deliveries the catch-up job asked GitHub to send again. No FK: the redelivery may not have arrived yet.
+model RedeliveryRequest {
+  deliveryId  String   @id @map("delivery_id") /// X-GitHub-Delivery guid
+  requestedAt DateTime @default(now()) @map("requested_at")
+
+  @@index([requestedAt])
+  @@map("redelivery_requests")
 }
