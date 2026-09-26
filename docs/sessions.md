@@ -5,7 +5,7 @@ How this project is built, one session at a time. Each session ends with working
 Source spec: [`prd.md`](prd.md)
 Workflow commands: [`commands.md`](commands.md)
 Tech stack: [`tech-stack.md`](tech-stack.md)
-Phase plans: [`phase/`](phase/) — [phase 1: authentication](phase/phase-1.md) · [phase 2: GitHub App and repos](phase/phase-2.md) · [phase 3: webhooks and queue](phase/phase-3.md) · [phase 4: rules and actions](phase/phase-4.md) · [phase 5: dashboard and observability](phase/phase-5.md)
+Phase plans: [`phase/`](phase/) — [phase 1: authentication](phase/phase-1.md) · [phase 2: GitHub App and repos](phase/phase-2.md) · [phase 3: webhooks and queue](phase/phase-3.md) · [phase 4: rules and actions](phase/phase-4.md) · [phase 5: dashboard and observability](phase/phase-5.md) · [phase 5.5: new UI backend gaps](phase/phase-5.5.md)
 
 ---
 
@@ -46,8 +46,9 @@ backend/              NestJS
     main.ts           bootstrap; app.module.ts is the composition root
     core/             cross-cutting infrastructure, no feature logic
       config/         zod env schema, fail fast on boot
+      context/        AsyncLocalStorage request context + X-Request-Id middleware
       database/       PrismaService
-      logger/         structured logger, redacts secrets
+      logger/         structured logger, redacts secrets, adds context ids
       errors/         domain errors + global filter mapping them to HTTP
       swagger.ts      dev-only API docs
     modules/          one folder per feature: module, controller, service, *.repository.ts (all SQL)
@@ -58,7 +59,8 @@ backend/              NestJS
       installations/  connect / sync / list repos, installation webhooks
       webhooks/       signature verify, dedupe, persist + enqueue, catch-up
       queue/          handler registry, job claim, retry/backoff, worker loop
-      events/         repo event normalising, events API
+      events/         repo event normalising, events list/detail (keyset), 24 h stats
+      failures/       failed/dead jobs and failed actions, manual retry
       rules/          rule CRUD + pure matcher (phase 4)
       actions/        label, comment, slack (phase 4; ai-triage later, Session 7)
 frontend/             React + Vite
@@ -66,10 +68,13 @@ frontend/             React + Vite
     app/              app root and router
     features/         one folder per feature: api.ts, schemas.ts, use-*.ts hooks, components, pages
       auth/           login page, protected route, session hooks
-      dashboard/      dashboard page (composes other features)
-      repositories/   repo list, installation groups, GitHub setup callback
-      events/         event log, webhook status
-    hooks/            shared hooks (visibility-aware polling)
+      shell/          app header, nav, repo filter (?repo=)
+      events/         events page: stats, live table, detail dialog
+      rules/          rule list, create/edit form
+      failures/       failures table, retry
+      repositories/   repositories page, installation groups, GitHub setup callback
+    hooks/            shared hooks (visibility-aware polling with backoff)
+    components/       shared app components (status badge)
     components/ui/    shadcn/ui (generated)
     lib/              Neon Auth client, api client (attaches JWT), env, utils
     styles/           globals.css entry + shadcn theme, components/*.css (@apply)
@@ -105,6 +110,20 @@ End-to-end checks run against **[jayshreee10/test-bot](https://github.com/jayshr
 - Pushes to `test-bot` are test fixtures only. The "no `git push` without approval" rule for this project's repo still applies.
 - Clean up with `gh issue close` / `gh pr close --delete-branch` after each run.
 
+## Automated tests
+
+Unit tests run with **Vitest** in both apps; `npm test` at the root runs both suites. Stack details: [`tech-stack.md`](tech-stack.md).
+
+| App | Files | Runs in | Mocked |
+|---|---|---|---|
+| `backend/` | `src/test/{core,modules}/<module>/*.spec.ts`; shared `fakes.ts`, `setup.ts` | Node | Prisma, GitHub API, Slack, JWKS |
+| `frontend/` | `src/test/{features,lib,hooks}/<module>/*.test.ts(x)`; shared `setup.ts` | jsdom + Testing Library | Neon Auth SDK, `fetch` |
+
+- Every session ships tests for what it builds, in the same commit series; a session is not done while `npm test` fails.
+- Test behaviour and failure paths (forged, duplicate, retried, unauthorised), not implementation details.
+- No database or network in unit tests. Real SQL (claim, insert-with-job) is covered by the `gh` checks above; a Neon test branch is a later option.
+- Added in `d7d675b` for Sessions 1–4, reversing the Session 1 decision to strip test tooling.
+
 ---
 
 ## Session 1 — Foundation
@@ -130,6 +149,7 @@ End-to-end checks run against **[jayshreee10/test-bot](https://github.com/jayshr
 - [ ] Switch frontend to React + Vite + Tailwind + shadcn/ui
 - [ ] `GET /api/health` (checks DB), landing page shows health status
 - [ ] Vite dev proxy `/api/*` → Nest API
+- [x] Tests: env validation (names only, never values), log redaction, domain error → HTTP mapping, health check
 
 **Done when:** running both apps locally, the web page shows the API health status.
 
@@ -144,6 +164,8 @@ End-to-end checks run against **[jayshreee10/test-bot](https://github.com/jayshr
 - [ ] Frontend: api client attaches the JWT as a Bearer token and refreshes it on expiry (15 min tokens)
 - [ ] Backend: global auth guard verifying the JWT via Neon Auth JWKS (signature, `iss`, `aud`, `exp`); `@Public()` for health and webhooks; `@CurrentUser()`; `GET /api/me`
 - [ ] Installation callback: verify the installation's GitHub account matches the signed-in user's GitHub id (from `neon_auth`), then store installation + repositories
+- [x] Tests, backend: JWT verification (valid, wrong issuer, expired, missing `sub`, unknown key, non-EdDSA), auth guard and `@Public()`, App JWT and caching, installation tokens, GitHub client (errors, rate limits, paging, big ids), installation ownership, sync and removal, GitHub identity lookup
+- [x] Tests, frontend: safe post-login redirect, protected route, login page, api client (Bearer, `ApiError`, schema parse), env, `useMe` / sign-out, repositories API and hook, setup callback (connects once, 403 message), repository list
 
 **Done when:** sign in with GitHub via Neon Auth, install the App on a repo, see it listed; `/api/*` rejects missing or forged tokens.
 
@@ -157,30 +179,36 @@ End-to-end checks run against **[jayshreee10/test-bot](https://github.com/jayshr
 - [ ] Worker: claim with `FOR UPDATE SKIP LOCKED`, exponential backoff, dead-letter after N attempts
 - [ ] Boot catch-up: list failed deliveries via App API and request redelivery (covers downtime and free-tier sleep)
 - [ ] Handle `issues`, `pull_request`, `push`
+- [x] Tests, backend: HMAC guard (forged, tampered, re-serialised body), header validation and `202`/`200`/`204` responses, dedupe (`duplicate`), worker (retry, dead-letter, crash loop, shutdown drain), backoff, lock-fenced job updates, catch-up redelivery, event normalising, installation webhooks, events API
+- [x] Tests, frontend: event log and rows, webhook status, relative time, visibility-aware polling
 
 **Done when:** a forged request is rejected, a redelivered event is ignored, and a killed worker resumes pending jobs. Verified with `gh` against the [test repository](#test-repository).
 
 ## Session 4 — Rules and actions
 
-**Goal:** the bot acts on events according to rules.
+**Goal:** the bot acts on events according to rules. Plan: [phase 4](phase/phase-4.md).
 
-- [ ] Installation token service (cached until expiry)
-- [ ] Rule matcher (pure): event type, title/body keywords, author, labels
-- [ ] Actions: add label, post comment, Slack notification
-- [ ] Per-action idempotency row; retries skip actions already succeeded
-- [ ] Rules CRUD API with zod validation
+- [x] Installation token service (cached until expiry; built in phase 2, 401 → refresh added here)
+- [x] Rule matcher (pure): event type, title/body keywords, author, labels
+- [x] Actions: add label, post comment, Slack notification
+- [x] Per-action idempotency row; retries skip actions already succeeded
+- [x] Rules CRUD API with zod validation
+- [x] Tests: rule matcher (whole-word keywords, AND/OR, case, branches), rule schema (event ↔ action checks), rules service (ownership → 404, merged re-validation), rules handler (loop guard, transient → retry), action runner (once per delivery/rule/type, comment recovery after crash), error classification, Slack escaping, GitHub label/comment calls
 
 **Done when:** opening an issue titled "bug …" adds the `bug` label and posts to Slack exactly once.
 
 ## Session 5 — Dashboard and observability
 
-**Goal:** the user can see and control everything.
+**Goal:** the user can see and control everything. Plan: [phase 5](phase/phase-5.md).
 
-- [ ] Event log with actions taken, live via short polling
-- [ ] Rules page: create, edit, enable/disable, delete
-- [ ] Failures page: failed/dead jobs with error and attempts, manual retry
-- [ ] Repository filter (multi-repo)
-- [ ] Request IDs and delivery IDs in every log line
+- [x] Event log with actions taken, live via short polling
+- [x] Rules page: create, edit, enable/disable, delete
+- [x] Failures page: failed/dead jobs with error and attempts, manual retry
+- [x] Repository filter (multi-repo)
+- [x] Request IDs and delivery IDs in every log line
+- [x] End-to-end `gh` checks on `test-bot` (phase 5 §7), plus a Chrome run of every page
+- [x] Tests, backend: events/failures read APIs (keyset paging, repo filter, user scoping, no raw payloads), manual retry (only `failed`/`dead`, owner only), request-id propagation
+- [x] Tests, frontend: rules page (create, edit, toggle, delete, validation errors), failures page and retry, repository filter, dashboard composition
 
 **Done when:** every event and failure from Sessions 3–4 is visible and retryable in the UI.
 
@@ -194,6 +222,7 @@ End-to-end checks run against **[jayshreee10/test-bot](https://github.com/jayshr
 - [ ] `AI_NOTES.md` condensed from `docs/ai-log.md` (tools, 2–3 decisions, hardest AI wrong turn, next steps)
 - [ ] Demo repo (`jayshreee10/test-bot`, see [Test repository](#test-repository)) + tester instructions
 - [ ] Full end-to-end run on live URLs
+- [ ] Tests: rate limiting on public endpoints; `npm test` runs in CI (or a pre-deploy step) before every deploy
 
 **Done when:** a fresh reviewer can follow the README and see the full flow work.
 
@@ -204,6 +233,7 @@ End-to-end checks run against **[jayshreee10/test-bot](https://github.com/jayshr
 - [ ] AI triage (Groq or Gemini): summary + suggested label + priority; shown in Slack and dashboard; degrades gracefully on failure
 - [ ] Env var for the AI key (optional; feature off when unset)
 - [ ] Redeploy and re-run the end-to-end check
+- [ ] Tests: AI response parsing, feature off when the key is unset, AI failure or timeout never blocks other actions
 
 **Done when:** a new issue gets a summary, label suggestion and priority in Slack and the dashboard, and an AI outage never blocks other actions.
 
@@ -273,6 +303,7 @@ In Session 6, `AI_NOTES.md` is condensed from this log. Likely candidates for th
 
 ### End-of-session checklist
 
+- [ ] `npm test`, `npm run lint` and `npm run build` pass
 - [ ] Code committed with clear messages
 - [ ] Session checkboxes ticked above
 - [ ] `CLAUDE.md` / `AGENTS.md` updated with new commands, modules, conventions
@@ -285,6 +316,7 @@ In Session 6, `AI_NOTES.md` is condensed from this log. Likely candidates for th
 - One module per concern; business logic in services, not controllers.
 - Add a package only when the platform can't do it cleanly.
 - Commit per logical step with clear messages.
+- Every feature ships with tests in `src/test/`, mirroring its module path (see [Automated tests](#automated-tests)); fixed bugs get a test that fails without the fix.
 - Log every change, feature, issue, root cause and fix in `.claude/sessions/session-N/` as it happens: dated table rows only.
 - **No `git push` without developer approval.** Enforced by an `ask` rule in `.claude/settings.json`; Claude must also request agreement in chat before pushing.
 - Never commit `node_modules`, build output, `.env` files, private keys, or editor/OS files. Extend `.gitignore` whenever a new tool adds generated files.

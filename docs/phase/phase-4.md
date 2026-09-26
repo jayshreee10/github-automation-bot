@@ -231,6 +231,17 @@ Clean up afterwards: `gh issue close` / `gh pr close --delete-branch`.
 
 ---
 
+### Answers (found while building)
+
+| Question | Answer |
+| --- | --- |
+| Missing label on `POST …/labels` | GitHub creates it (verified with `needs-review` on test-bot) |
+| Slack webhook | One global `SLACK_WEBHOOK_URL` |
+| Rule edited between retries | Current version is used; a disabled rule's pending actions simply stay pending |
+| Keywords | Whole word, case-insensitive, Unicode-aware |
+| Bot login | `<GITHUB_APP_SLUG>[bot]` |
+| Transient vs permanent in the DB | Transient failure keeps the action `pending` with `error` set; permanent sets `failed` |
+
 ## 9. Follow-ups in `sessions.md`
 
 - Session 4: link this plan; tick "Installation token service" (done in phase 2).

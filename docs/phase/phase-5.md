@@ -6,6 +6,40 @@ Sources: [`prd.md`](../prd.md) · [`tech-stack.md`](../tech-stack.md) · [`sessi
 
 ---
 
+## As built (2026-09-26)
+
+Where the code differs from the plan below, the code wins:
+
+| Plan | Built | Why |
+| --- | --- | --- |
+| `common/`, `dashboard/`, `pages/` paths | `core/context/`, `modules/events/` (list, detail, stats), `modules/failures/` (list, retry); frontend `features/{shell,events,rules,failures}/` | Matches the core/modules + features layout from the refactor |
+| `after=<cursor>` polling | Each poll re-fetches the first page; "Load more" uses `before` | One query returns new rows *and* status changes of recent rows |
+| Webhook status on the event log | Moved to `GET /api/stats` | The list response is paged; stats is the per-scope summary |
+| Retry only `failed` / `dead` | Also a `succeeded` job with `failed` actions; those actions go back to `pending` in the same transaction | A wrong Slack URL (404) is a permanent action failure, so the job itself succeeds; check 5 needs this |
+| Retry clears `last_error` | Kept until the next run overwrites it | Matches "To confirm" row 3 |
+| Summary built from the payload in TS | Summary fields selected in SQL, normalised by a pure function | Push payloads can be MBs; the payload never leaves Postgres |
+| B12 index on `jobs(status, updated_at)` | Not added | Query plans are fine at this size |
+| New rule defaults to the first repo | No default unless `?repo=` is set; the form requires a choice | In the Chrome run a missed dropdown click silently created a rule on the wrong repo |
+
+### End-to-end run (2026-09-26, `test-bot`, Chrome)
+
+| # | Result |
+| --- | --- |
+| 1 | #16 appeared and showed Label · Comment · Slack succeeded |
+| 2 | PR #17 (label + comment) and a push on `phase5-e2e` shown with correct type and summary |
+| 3 | "Feature requests" created in the UI, "Bug triage" disabled: #18 got `enhancement` + comment, #19 got nothing |
+| 4 | Wrong Slack URL: #20 listed on Failures with `Slack webhook 404`, job `succeeded` |
+| 5 | Slack fixed, Retry: only `slack_notify` ran; still one comment and one `bug` label |
+| 6 | Dead phase 3 job retried: `pending` → `succeeded`; a second request returned `409` |
+| 7 | Filter on `github-automation-bot`: events, rules, failures scoped; kept across nav and reload |
+| 8 | 0 polls in 25–45 s hidden; 4 polls in 12 s visible; resumes on show |
+| 9 | Webhook line: request id + delivery id; handler, action and worker lines: delivery id + job id |
+| 10 | Foreign delivery/job (temporary fixture) → `404`, absent from lists and stats; no or forged JWT → `401` |
+
+The Chrome window was occluded, so "visible" was simulated by overriding `document.hidden` and firing `visibilitychange`, the same path a real tab switch takes.
+
+---
+
 ## 1. Scope
 
 | In scope                                                                            | Out of scope (later phases)                        |
