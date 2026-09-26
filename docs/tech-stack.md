@@ -28,6 +28,7 @@
 | API access | Relative `/api/*` calls with `Authorization: Bearer <Neon Auth JWT>`; Vite dev proxy to the backend |
 | Validation | zod (`VITE_*` env, API responses, form input) |
 | Linting | `oxlint` |
+| Testing | Vitest + jsdom + Testing Library; Neon Auth SDK and `fetch` mocked |
 
 ### Versions
 
@@ -45,6 +46,7 @@
 | `@neondatabase/auth` | 0.5 (beta) |
 | `react-router` | 8 |
 | `zustand` | 5 |
+| `vitest`, `jsdom`, `@testing-library/react` | 5, 30, 16 |
 
 ### Conventions
 
@@ -58,6 +60,7 @@
 - Only `VITE_*` env vars are bundled into the browser; never put secrets in them.
 - Auth tokens are never stored in `localStorage` by app code; the Neon Auth SDK owns the session.
 - Zustand stores live in `src/stores/`, one per concern. Read with selectors, keep actions inside the store, never copy auth/session into a store.
+- Tests sit next to their source as `*.test.ts(x)`; run with `npm test -w frontend`.
 
 ### Excluded
 
@@ -84,6 +87,7 @@ Next.js / SSR, state-management libraries other than Zustand (Redux, MobX, Jotai
 | AI | Later (Session 7): Groq or Gemini free tier via `fetch` — not used for now |
 | Local webhooks | [smee.io](https://smee.io) channel to localhost |
 | Linting / format | `oxlint`, `prettier` |
+| Testing | Vitest unit tests; Prisma, GitHub and Slack mocked (no DB or network) |
 
 ### Versions
 
@@ -96,6 +100,7 @@ Next.js / SSR, state-management libraries other than Zustand (Redux, MobX, Jotai
 | `@nestjs/swagger` | 12 |
 | `prisma`, `@prisma/client` | 7.10.0 (pinned stable; npm `latest` is an 8.0 RC) |
 | `oxlint`, `prettier` | 1, 3 |
+| `vitest` | 5 |
 
 ### Conventions
 
@@ -109,7 +114,8 @@ Next.js / SSR, state-management libraries other than Zustand (Redux, MobX, Jotai
 - DB scripts: `db:migrate` (dev), `db:deploy` (prod), `db:status`, `db:generate`, `db:studio`.
 - Every route requires a valid Neon Auth JWT unless marked `@Public()` (health, webhooks).
 - Users are owned by Neon Auth (`neon_auth` schema); Prisma never migrates that schema.
+- Tests sit next to their source as `*.spec.ts`, excluded from the build; shared fakes live in `src/test/`. Run with `npm test -w backend`, or `npm test` at the root for both apps.
 
 ### Excluded
 
-Automated tests (Jest / Vitest), `class-validator` / `class-transformer`, Redis/BullMQ, Docker, websockets, Octokit, `dotenv`, hand-rolled OAuth/session handling (Neon Auth owns it).
+Jest (Vitest is the test runner), `class-validator` / `class-transformer`, Redis/BullMQ, Docker, websockets, Octokit, `dotenv`, hand-rolled OAuth/session handling (Neon Auth owns it).
