@@ -27,7 +27,7 @@ const app: AppInfo = { events: ['issues', 'push'], permissions: { issues: 'write
 
 function setup(state: Partial<ReturnType<typeof useRepositories>> = {}, appState: ReturnType<typeof useAppInfo> = { data: app, error: false }) {
   const syncAll = vi.fn().mockResolvedValue(true)
-  vi.mocked(useRepositories).mockReturnValue({ data, error: null, syncing: null, sync: vi.fn(), syncAll, ...state })
+  vi.mocked(useRepositories).mockReturnValue({ data, error: null, syncing: null, sync: vi.fn(), syncAll, reload: vi.fn(), ...state })
   vi.mocked(useAppInfo).mockReturnValue(appState)
   render(
     <MemoryRouter>
@@ -107,15 +107,6 @@ describe('RepositoriesPage', () => {
     expect(screen.getAllByText('Could not load app details.')).toHaveLength(2)
     const row = screen.getByRole('row', { name: /markly/ })
     expect(within(row).getByText('pull_request')).toBeTruthy()
-  })
-
-  it('offers the install link when nothing is connected', () => {
-    setup({ data: { installations: [], repositories: [] } })
-    expect(screen.getByText('No repositories connected yet')).toBeTruthy()
-    expect(screen.getByRole('link', { name: 'Install GitHub App' }).getAttribute('href')).toBe(
-      'https://github.com/apps/test-bot/installations/new',
-    )
-    expect(screen.getByRole('button', { name: 'Sync from GitHub' }).hasAttribute('disabled')).toBe(true)
   })
 
   it('shows the load error', () => {

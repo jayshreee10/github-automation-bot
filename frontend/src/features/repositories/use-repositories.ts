@@ -37,7 +37,12 @@ function load(): Promise<void> {
   return inFlight
 }
 
-// Tests only: forget the shared list between cases.
+// Stores a list fetched elsewhere, e.g. the setup callback's response, so gated pages see it at once.
+export function setRepositories(data: RepositoryList) {
+  setList(data)
+}
+
+// Forgets the shared list, so the next user in this tab starts fresh. Also used between tests.
 export function resetRepositoriesStore() {
   snapshot = { data: null, error: null }
   loadedAt = 0
@@ -88,5 +93,5 @@ export function useRepositories() {
     }
   }, [])
 
-  return { data, error, syncing, sync, syncAll }
+  return { data, error, syncing, sync, syncAll, reload: load }
 }

@@ -5,9 +5,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/lib/api'
 import { connectInstallation } from '@/features/repositories/api'
 import { GithubSetupPage } from '@/features/repositories/github-setup-page'
+import { setRepositories } from '@/features/repositories/use-repositories'
 
 vi.mock('@/features/repositories/api', () => ({ connectInstallation: vi.fn() }))
 vi.mock('@/lib/auth-client', () => ({ authClient: {} }))
+vi.mock('@/features/repositories/use-repositories', () => ({ setRepositories: vi.fn() }))
 
 function renderAt(path: string) {
   const router = createMemoryRouter(
@@ -42,11 +44,12 @@ describe('GithubSetupPage', () => {
     expect(connectInstallation).not.toHaveBeenCalled()
   })
 
-  it('connects once and returns to the dashboard', async () => {
+  it('connects once, stores the list and returns to the dashboard', async () => {
     renderAt('/github/setup?installation_id=42&setup_action=install')
     expect(await screen.findByText('dashboard')).toBeTruthy()
     expect(connectInstallation).toHaveBeenCalledTimes(1)
     expect(connectInstallation).toHaveBeenCalledWith('42')
+    expect(setRepositories).toHaveBeenCalledWith({ installations: [], repositories: [] })
   })
 
   it('explains a 403 as an installation on another account', async () => {

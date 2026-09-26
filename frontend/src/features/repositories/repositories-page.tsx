@@ -1,7 +1,6 @@
 import { Plus, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TopBar } from '@/features/shell/top-bar'
 import { AppDetails } from './app-details'
@@ -50,19 +49,6 @@ export function RepositoriesPage() {
           <div className="repos-main">
             {error && <p className="error-text">{error}</p>}
             {!data && !error && <Skeleton className="table-skeleton" />}
-            {data?.installations.length === 0 && (
-              <Empty className="empty-card">
-                <EmptyHeader>
-                  <EmptyTitle>No repositories connected yet</EmptyTitle>
-                  <EmptyDescription>Install the GitHub App and pick the repos the bot may watch.</EmptyDescription>
-                </EmptyHeader>
-                <EmptyContent>
-                  <Button asChild>
-                    <a href={INSTALL_URL}>Install GitHub App</a>
-                  </Button>
-                </EmptyContent>
-              </Empty>
-            )}
             {data &&
               groupByInstallation(data).map((group) => (
                 <InstallationCard key={group.installation.id} group={group} events={events} />

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { ApiError } from '@/lib/api'
 import { connectInstallation } from './api'
+import { setRepositories } from './use-repositories'
 
 // GitHub installation ids are positive integers; anything else is a broken or tampered link.
 const INSTALLATION_ID = /^[1-9][0-9]{0,18}$/
@@ -20,7 +21,10 @@ export function GithubSetupPage() {
     if (!installationId || sentFor.current === installationId) return
     sentFor.current = installationId
     connectInstallation(installationId)
-      .then(() => navigate('/', { replace: true }))
+      .then((list) => {
+        setRepositories(list)
+        navigate('/', { replace: true })
+      })
       .catch((err: unknown) =>
         setError(
           err instanceof ApiError && err.status === 403

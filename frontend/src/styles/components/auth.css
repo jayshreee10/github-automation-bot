@@ -1,4 +1,4 @@
-/* Sign-in split screen, plus the centred card used by the GitHub setup callback. */
+/* Sign-in split screen, plus the centred cards for connecting the GitHub App. */
 @layer components {
   .auth-screen {
     @apply flex min-h-svh items-center justify-center px-6;
@@ -111,6 +111,10 @@
 
   .setup-card {
     @apply flex w-full max-w-sm flex-col items-center gap-4 rounded-2xl border bg-card p-8 text-center text-card-foreground shadow-card;
+  }
+
+  .connect-card {
+    @apply flex w-full max-w-md flex-col items-center gap-6 rounded-2xl border bg-card p-9 text-center text-card-foreground shadow-card;
   }
 
   .setup-link {
