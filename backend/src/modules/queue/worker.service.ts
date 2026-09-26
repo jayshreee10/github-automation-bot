@@ -4,7 +4,6 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
-import { ConfigService } from '../../core/config/config.service.js';
 import { requestContext } from '../../core/context/request-context.js';
 import { errorMessage } from '../../core/errors/error-message.js';
 import { HandlerRegistry } from './handler.registry.js';
@@ -16,6 +15,12 @@ import {
   POLL_INTERVAL_MS,
 } from './queue.constants.js';
 
+// TESTING ONLY: uncomment the throw to make every job fail, so the Failures page shows Retrying, then Dead.
+function failForTesting(): void {
+  // FAIL_FOR_TESTING: uncomment the next line to force job failures; comment it again to restore.
+  // throw new Error('test failure');
+}
+
 // In-process worker. One batch at a time; on shutdown it stops claiming and waits for the batch in flight.
 @Injectable()
 export class WorkerService implements BeforeApplicationShutdown {
@@ -26,7 +31,6 @@ export class WorkerService implements BeforeApplicationShutdown {
   constructor(
     private readonly jobs: JobRepository,
     private readonly registry: HandlerRegistry,
-    private readonly config: ConfigService,
   ) {}
 
   @Interval(POLL_INTERVAL_MS)
@@ -69,7 +73,7 @@ export class WorkerService implements BeforeApplicationShutdown {
       const handler = this.registry.get(delivery.event);
       if (!handler)
         throw new PermanentJobError(`no handler for ${delivery.event}`);
-      this.maybeForceFailure(delivery.event);
+      failForTesting();
 
       await handler.handle(delivery);
       await this.jobs.succeed(job);
@@ -79,14 +83,5 @@ export class WorkerService implements BeforeApplicationShutdown {
       const log = outcome === 'dead' ? 'error' : 'warn';
       this.logger[log](`${tag}: ${outcome} (${errorMessage(err)})`);
     }
-  }
-
-  // Dev-only hook for testing retries and dead-lettering (QUEUE_FAIL_EVENT). No effect in production.
-  private maybeForceFailure(event: string): void {
-    if (
-      this.config.get('NODE_ENV') !== 'production' &&
-      this.config.get('QUEUE_FAIL_EVENT') === event
-    )
-      throw new Error('forced failure (QUEUE_FAIL_EVENT)');
   }
 }

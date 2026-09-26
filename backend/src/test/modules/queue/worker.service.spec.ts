@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { delivery, fakeConfig } from '../../fakes.js';
-import type { Env } from '../../../core/config/env.js';
+import { delivery } from '../../fakes.js';
 import { HandlerRegistry } from '../../../modules/queue/handler.registry.js';
 import { PermanentJobError } from '../../../modules/queue/job-errors.js';
 import type { ClaimedJob, JobRepository } from '../../../modules/queue/job.repository.js';
@@ -9,7 +8,7 @@ import { requestContext } from '../../../core/context/request-context.js';
 
 const job = (attempts = 1, id = 'j1'): ClaimedJob => ({ id, deliveryId: 'd-1', attempts, lockedAt: new Date() });
 
-function setup(claimed: ClaimedJob[], config: Partial<Env> = { NODE_ENV: 'development' }) {
+function setup(claimed: ClaimedJob[]) {
   const jobs = {
     claim: vi.fn().mockResolvedValueOnce(claimed).mockResolvedValue([]),
     findDelivery: vi.fn().mockResolvedValue(delivery()),
@@ -19,7 +18,7 @@ function setup(claimed: ClaimedJob[], config: Partial<Env> = { NODE_ENV: 'develo
   const handle = vi.fn().mockResolvedValue(undefined);
   const registry = new HandlerRegistry();
   registry.register({ events: ['issues'], handle });
-  const worker = new WorkerService(jobs as unknown as JobRepository, registry, fakeConfig(config));
+  const worker = new WorkerService(jobs as unknown as JobRepository, registry);
   // poll() is fire-and-forget; shutdown waits for the batch in flight.
   const tick = async () => {
     worker.poll();
@@ -98,16 +97,5 @@ describe('WorkerService', () => {
     const { jobs, tick } = setup([]);
     jobs.claim.mockReset().mockRejectedValue(new Error('db down'));
     await expect(tick()).resolves.toBeUndefined();
-  });
-
-  it('forces failures for QUEUE_FAIL_EVENT in development only', async () => {
-    const dev = setup([job()], { NODE_ENV: 'development', QUEUE_FAIL_EVENT: 'issues' });
-    await dev.tick();
-    expect(dev.handle).not.toHaveBeenCalled();
-    expect(dev.jobs.fail).toHaveBeenCalled();
-
-    const prod = setup([job()], { NODE_ENV: 'production', QUEUE_FAIL_EVENT: 'issues' });
-    await prod.tick();
-    expect(prod.handle).toHaveBeenCalled();
   });
 });

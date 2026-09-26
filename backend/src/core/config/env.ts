@@ -31,8 +31,6 @@ const envSchema = z.object({
   ),
   // Dev only: smee.io channel that `npm run webhooks` forwards to localhost.
   SMEE_URL: z.url({ protocol: /^https$/ }).optional(),
-  // Dev only: jobs for this event throw a transient error, to exercise retries. Ignored in production.
-  QUEUE_FAIL_EVENT: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
