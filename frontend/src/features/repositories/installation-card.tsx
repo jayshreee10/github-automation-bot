@@ -4,6 +4,7 @@ import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { initials } from '@/lib/initials'
+import { repoShortName } from '@/lib/repo-name'
 import { shortAge } from '@/lib/time'
 import { configureInstallationUrl, repositoryUrl } from './github-urls'
 import type { InstallationGroupData } from './group-by-installation'
@@ -52,8 +53,8 @@ export function InstallationCard({ group, events }: { group: InstallationGroupDa
               <TableRow key={r.id}>
                 <TableCell>
                   <div className="repo-cell">
-                    <a className="repo-name" href={repositoryUrl(r.fullName)} target="_blank" rel="noreferrer">
-                      {r.fullName}
+                    <a className="repo-name" href={repositoryUrl(r.fullName)} target="_blank" rel="noreferrer" title={r.fullName}>
+                      {repoShortName(r.fullName)}
                     </a>
                     <span className="repo-meta">{repoMeta(r)}</span>
                   </div>

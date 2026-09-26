@@ -116,7 +116,7 @@ export function RuleEditor({ initial, repositories, isNew, onSave, onDelete, onC
                   <SelectGroup>
                     {repositories.map((r) => (
                       <SelectItem key={r.id} value={r.id}>
-                        {r.fullName}
+                        {shortRepoName(r.fullName)}
                       </SelectItem>
                     ))}
                   </SelectGroup>

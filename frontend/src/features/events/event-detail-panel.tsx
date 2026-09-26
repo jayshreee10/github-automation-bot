@@ -9,7 +9,7 @@ import { useRepoFilter } from '@/features/shell/use-repo-filter'
 import { actionTone, deliveryStatus, eventKey } from '@/lib/status'
 import { clockTime } from '@/lib/time'
 import { fetchEventDetail } from './api'
-import { authorHandle, conditionSegments, payloadExcerpt, subjectTitle } from './event-text'
+import { authorHandle, conditionSegments, payloadExcerpt, repoShortName, rulesNotRunYet, subjectTitle } from './event-text'
 import type { EventDetail } from './schemas'
 
 type DetailAction = EventDetail['actions'][number]
@@ -142,7 +142,7 @@ export function EventDetailPanel({ deliveryId, version, onClose }: Props) {
             <h2 className="event-detail-title">{subjectTitle(detail.summary)}</h2>
             <span className="event-detail-meta">
               {[
-                detail.repository.fullName,
+                repoShortName(detail.repository.fullName),
                 author && `${detail.event === 'push' ? 'pushed' : detail.action ?? 'sent'} by ${author}`,
                 clockTime(detail.receivedAt),
               ]
@@ -189,7 +189,11 @@ export function EventDetailPanel({ deliveryId, version, onClose }: Props) {
 
           <section className="detail-section">
             <span className="detail-label">{detail.rules.length > 1 ? 'Rules matched' : 'Rule matched'}</span>
-            {detail.rules.length === 0 && <p className="muted-text">No rule matched this event.</p>}
+            {detail.rules.length === 0 && (
+              <p className="muted-text">
+                {rulesNotRunYet(detail.job) ? 'Rules run once the job succeeds.' : 'No rule matched this event.'}
+              </p>
+            )}
             {detail.rules.map((rule) => (
               <div key={rule.id} className="rule-match">
                 <div className="rule-match-head">

@@ -57,13 +57,13 @@ describe('RepositoriesPage', () => {
 
   it('shows rule count, last event and status per repository', () => {
     setup()
-    const receiving = screen.getByRole('row', { name: /alice\/markly/ })
+    const receiving = screen.getByRole('row', { name: /markly/ })
     expect(within(receiving).getByText('Public · main')).toBeTruthy()
     expect(within(receiving).getByText('2')).toBeTruthy()
     expect(within(receiving).getByText('8m ago')).toBeTruthy()
     expect(within(receiving).getByText('Receiving')).toBeTruthy()
 
-    const waiting = screen.getByRole('row', { name: /alice\/ffmint/ })
+    const waiting = screen.getByRole('row', { name: /ffmint/ })
     expect(within(waiting).getByText('Private · dev')).toBeTruthy()
     expect(within(waiting).getByText('No events yet')).toBeTruthy()
     expect(within(waiting).getByText('Waiting for events')).toBeTruthy()
@@ -105,7 +105,7 @@ describe('RepositoriesPage', () => {
   it('keeps the page usable when App details fail, falling back to the default event chips', () => {
     setup({}, { data: null, error: true })
     expect(screen.getAllByText('Could not load app details.')).toHaveLength(2)
-    const row = screen.getByRole('row', { name: /alice\/markly/ })
+    const row = screen.getByRole('row', { name: /markly/ })
     expect(within(row).getByText('pull_request')).toBeTruthy()
   })
 

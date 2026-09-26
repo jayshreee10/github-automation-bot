@@ -89,6 +89,4 @@ export function ruleSummary(rule: {
 }
 
 // "acme/api" → "api": the design shows the short repo name under each rule.
-export function shortRepoName(fullName: string): string {
-  return fullName.split('/').at(-1) ?? fullName
-}
+export { repoShortName as shortRepoName } from '@/lib/repo-name'

@@ -77,3 +77,12 @@ describe('event text', () => {
     expect(push).toEqual({ ref: 'main', head_commit: { message: 'fix' }, sender: { login: 'alice' }, repository: { full_name: 'acme/api' } })
   })
 })
+
+describe('rulesNotRunYet', () => {
+  it('is true until the job succeeds, and false with no job', async () => {
+    const { rulesNotRunYet } = await import('@/features/events/event-text')
+    for (const status of ['pending', 'running', 'failed', 'dead']) expect(rulesNotRunYet({ status })).toBe(true)
+    expect(rulesNotRunYet({ status: 'succeeded' })).toBe(false)
+    expect(rulesNotRunYet(null)).toBe(false)
+  })
+})

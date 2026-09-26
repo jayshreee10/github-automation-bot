@@ -14,9 +14,7 @@ export function authorHandle(author: string | null): string | null {
   return author.endsWith('[bot]') ? author : `@${author}`
 }
 
-export function repoShortName(fullName: string): string {
-  return fullName.split('/').at(-1) ?? fullName
-}
+export { repoShortName } from '@/lib/repo-name'
 
 // Chip text for one action: "label: bug", "comment", "Slack".
 export function actionChipText(action: EventItem['actions'][number]): string {
@@ -86,4 +84,9 @@ export function payloadExcerpt(d: EventDetail): string {
     null,
     2,
   )
+}
+
+// Rules only run when the job does; before it succeeds, "no actions" does not mean "no rule matched".
+export function rulesNotRunYet(job: { status: string } | null): boolean {
+  return job !== null && job.status !== 'succeeded'
 }

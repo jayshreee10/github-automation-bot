@@ -67,6 +67,7 @@ export function RepositoriesPage() {
               groupByInstallation(data).map((group) => (
                 <InstallationCard key={group.installation.id} group={group} events={events} />
               ))}
+            {/* Hidden for now: "Add another account or organization" prompt.
             {data && data.installations.length > 0 && (
               <div className="add-account">
                 <span className="add-account-icon">
@@ -82,7 +83,7 @@ export function RepositoriesPage() {
                   <a href={INSTALL_URL}>Install GitHub App</a>
                 </Button>
               </div>
-            )}
+            )} */}
           </div>
           <aside className="repos-side">
             <AppDetails data={app.data} error={app.error} />

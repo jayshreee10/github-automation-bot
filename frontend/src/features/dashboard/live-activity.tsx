@@ -9,6 +9,7 @@ import { fetchEvents } from '@/features/events/api'
 import { EventSubject } from '@/features/events/event-subject'
 import type { EventItem } from '@/features/events/schemas'
 import { useVisiblePolling } from '@/hooks/use-visible-polling'
+import { repoShortName } from '@/lib/repo-name'
 import { deliveryStatus, eventKey, type StatusText } from '@/lib/status'
 import { shortAge } from '@/lib/time'
 
@@ -69,10 +70,10 @@ export function LiveActivity({ repoId, search }: { repoId: string | null; search
                       <span className="mono">{eventKey(e.event, e.action)}</span>
                     </TableCell>
                     <TableCell className="subject-cell">
-                      <EventSubject summary={e.summary} detail={e.repository.fullName} />
+                      <EventSubject summary={e.summary} detail={repoShortName(e.repository.fullName)} />
                     </TableCell>
                     <TableCell>
-                      <ActionChips actions={e.actions} />
+                      <ActionChips actions={e.actions} job={e.job} />
                     </TableCell>
                     <TableCell>
                       <StatusBadge tone={status.tone}>{status.text}</StatusBadge>
