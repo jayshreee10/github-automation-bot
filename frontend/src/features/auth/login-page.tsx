@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Navigate, useSearchParams } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
-import { safeNextPath } from '@/lib/redirect'
+import { safeNextPath } from './redirect'
 
 export function LoginPage() {
   const { data, isPending } = authClient.useSession()

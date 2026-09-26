@@ -7,10 +7,6 @@
     @apply flex items-center justify-between gap-4;
   }
 
-  .section-title {
-    @apply font-heading text-lg font-semibold tracking-tight;
-  }
-
   .repo-group {
     @apply rounded-xl border bg-card text-card-foreground;
   }
@@ -45,17 +41,5 @@
 
   .repo-badge {
     @apply rounded-md border px-2 py-0.5 text-xs text-muted-foreground;
-  }
-
-  .muted-text {
-    @apply text-sm text-muted-foreground;
-  }
-
-  .setup-card {
-    @apply flex w-full max-w-sm flex-col items-center gap-4 rounded-xl border bg-card p-8 text-center text-card-foreground shadow-sm;
-  }
-
-  .setup-link {
-    @apply text-sm underline underline-offset-4;
   }
 }

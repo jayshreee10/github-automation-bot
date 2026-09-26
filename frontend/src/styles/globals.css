@@ -5,6 +5,7 @@
 
 /* App component styles: semantic classes built with @apply. One file per UI area. */
 @import "./components/layout.css";
+@import "./components/feedback.css";
 @import "./components/auth.css";
 @import "./components/repositories.css";
 @import "./components/events.css";

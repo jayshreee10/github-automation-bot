@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
-import { apiFetch, ApiError } from '@/lib/api'
-import { repositoryListSchema } from '@/lib/schemas'
+import { ApiError } from '@/lib/api'
+import { connectInstallation } from './api'
+
+// GitHub installation ids are positive integers; anything else is a broken or tampered link.
+const INSTALLATION_ID = /^[1-9][0-9]{0,18}$/
 
 // GitHub's Setup URL lands here after install or configure. The backend verifies ownership.
 export function GithubSetupPage() {
@@ -10,18 +13,13 @@ export function GithubSetupPage() {
   const [error, setError] = useState<string | null>(null)
   const sentFor = useRef<string | null>(null)
   const raw = params.get('installation_id')
-  // GitHub installation ids are positive integers; anything else is a broken or tampered link.
-  const installationId = raw && /^[1-9][0-9]{0,18}$/.test(raw) ? raw : null
+  const installationId = raw && INSTALLATION_ID.test(raw) ? raw : null
 
   useEffect(() => {
     // StrictMode runs effects twice in dev; send once per installation id.
     if (!installationId || sentFor.current === installationId) return
     sentFor.current = installationId
-    apiFetch('/installations', repositoryListSchema, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ installationId }),
-    })
+    connectInstallation(installationId)
       .then(() => navigate('/', { replace: true }))
       .catch((err: unknown) =>
         setError(

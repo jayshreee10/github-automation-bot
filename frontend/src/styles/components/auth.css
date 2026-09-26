@@ -1,3 +1,4 @@
+/* Centered card screens: sign-in and the GitHub setup callback. */
 @layer components {
   .auth-screen {
     @apply flex min-h-svh items-center justify-center px-6;
@@ -19,19 +20,11 @@
     @apply w-full;
   }
 
-  .dashboard-header {
-    @apply mb-6 flex items-center justify-between gap-4;
+  .setup-card {
+    @apply flex w-full max-w-sm flex-col items-center gap-4 rounded-xl border bg-card p-8 text-center text-card-foreground shadow-sm;
   }
 
-  .user-badge {
-    @apply text-sm text-muted-foreground;
-  }
-
-  .screen-message {
-    @apply flex min-h-svh items-center justify-center text-sm text-muted-foreground;
-  }
-
-  .error-text {
-    @apply text-sm text-destructive;
+  .setup-link {
+    @apply text-sm underline underline-offset-4;
   }
 }

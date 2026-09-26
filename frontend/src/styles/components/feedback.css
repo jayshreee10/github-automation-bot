@@ -1,0 +1,10 @@
+/* Shared status text used by every feature: errors, loading and empty states. */
+@layer components {
+  .error-text {
+    @apply text-sm text-destructive;
+  }
+
+  .muted-text {
+    @apply text-sm text-muted-foreground;
+  }
+}
