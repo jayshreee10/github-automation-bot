@@ -1,79 +1,238 @@
+/* Event log page, its detail panel, and event cells shared with the dashboard. */
 @layer components {
-  .events-section {
-    @apply mt-8 flex flex-col gap-4;
+  .event-subject {
+    @apply flex min-w-0 flex-col text-left;
   }
 
-  .events-header {
-    @apply flex flex-wrap items-center justify-between gap-3;
+  .event-subject-title {
+    @apply truncate font-medium;
   }
 
-  .webhook-status {
-    @apply inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium;
+  .event-subject-detail {
+    @apply truncate text-xs text-muted-foreground;
   }
 
-  .webhook-dot {
-    @apply size-2 rounded-full bg-muted-foreground;
+  .subject-cell {
+    @apply max-w-md;
   }
 
-  .webhook-status[data-state='connected'] .webhook-dot {
-    @apply bg-emerald-500;
+  .cell-end {
+    @apply text-right;
   }
 
-  .webhook-status[data-state='waiting'] .webhook-dot {
-    @apply bg-amber-500;
+  .cell-time {
+    @apply text-[13px] whitespace-nowrap text-muted-foreground;
   }
 
-  .webhook-status[data-state='off'] .webhook-dot {
-    @apply bg-destructive;
+  .no-match {
+    @apply text-[13px] text-muted-foreground;
   }
 
-  .event-list {
-    @apply divide-y rounded-xl border bg-card text-card-foreground;
+  .action-chip[data-status='failed'] {
+    @apply bg-destructive/15 text-destructive-text;
   }
 
-  .event-item {
-    @apply flex flex-col gap-1 px-4 py-3;
+  .action-chip[data-status='pending'] {
+    @apply text-muted-foreground;
+  }
+
+  /* Page body: log on the left, detail panel on the right. */
+  .event-log {
+    @apply flex min-h-0 flex-1;
+  }
+
+  .event-log-main {
+    @apply gap-5 pr-6;
+  }
+
+  .event-toolbar {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .event-search {
+    @apply w-64;
+  }
+
+  .status-filter {
+    @apply ml-auto;
   }
 
   .event-row {
-    @apply flex items-center justify-between gap-4;
+    @apply cursor-pointer;
   }
 
-  .event-main {
-    @apply flex min-w-0 items-center gap-2;
+  .row-select {
+    @apply w-full min-w-0 cursor-pointer rounded-md text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50;
   }
 
-  .event-type {
-    @apply shrink-0 rounded-md bg-muted px-2 py-0.5 font-mono text-xs;
+  .event-pager {
+    @apply flex items-center justify-between text-[13px];
   }
 
-  .event-title {
-    @apply truncate text-sm font-medium hover:underline;
+  .event-pager-text {
+    @apply text-muted-foreground;
   }
 
-  .event-meta {
+  .event-pager-buttons {
+    @apply flex gap-1.5;
+  }
+
+  .event-detail {
+    @apply sticky top-0 flex max-h-svh w-[440px] shrink-0 flex-col self-start overflow-y-auto border-l bg-card;
+  }
+
+  .event-detail-head {
+    @apply flex flex-col gap-2.5 border-b px-6 py-5;
+  }
+
+  .event-detail-badges {
+    @apply flex items-center gap-2;
+  }
+
+  .event-detail-badges .status-badge[data-tone='outline'] {
+    @apply font-mono;
+  }
+
+  .event-detail-close {
+    @apply ml-auto;
+  }
+
+  .event-detail-title {
+    @apply text-lg font-semibold tracking-[-0.02em] break-words;
+  }
+
+  .event-detail-meta {
+    @apply text-[13px] text-muted-foreground;
+  }
+
+  .event-detail-skeleton {
+    @apply h-12 w-full;
+  }
+
+  .event-detail-body {
+    @apply flex flex-col gap-[22px] px-6 py-5;
+  }
+
+  .detail-section {
+    @apply flex flex-col gap-2;
+  }
+
+  .detail-label {
+    @apply text-sm font-medium;
+  }
+
+  .detail-section .kv {
+    @apply py-2;
+  }
+
+  .detail-section .mono {
+    @apply break-all text-right;
+  }
+
+  .signature-ok {
+    @apply flex items-center gap-1.5 font-medium text-accent-foreground;
+  }
+
+  .signature-ok svg {
+    @apply size-4;
+  }
+
+  .rule-match {
+    @apply flex flex-col gap-1.5 rounded-xl border px-3.5 py-3;
+  }
+
+  .rule-match-head {
+    @apply flex items-center justify-between gap-2;
+  }
+
+  .rule-match-name {
+    @apply font-semibold;
+  }
+
+  .rule-match-conditions {
+    @apply text-[13px] text-muted-foreground;
+  }
+
+  .rule-match-value {
+    @apply font-mono text-xs text-foreground;
+  }
+
+  .action-list {
+    @apply flex flex-col gap-2.5;
+  }
+
+  .action-row {
+    @apply flex items-start gap-3;
+  }
+
+  .action-icon {
+    @apply flex size-7 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground;
+  }
+
+  .action-icon svg {
+    @apply size-4;
+  }
+
+  .action-icon[data-tone='success'] {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  .action-icon[data-tone='destructive'] {
+    @apply bg-destructive/15 text-destructive-text;
+  }
+
+  .action-body {
+    @apply flex min-w-0 flex-1 flex-col gap-0.5;
+  }
+
+  .action-line {
+    @apply flex items-center gap-2;
+  }
+
+  .action-title {
+    @apply flex flex-wrap items-center gap-1.5 font-medium;
+  }
+
+  a.action-title {
+    @apply underline-offset-4 hover:underline;
+  }
+
+  .action-title-chip {
+    @apply h-5;
+  }
+
+  .action-duration {
+    @apply ml-auto text-xs whitespace-nowrap text-muted-foreground;
+  }
+
+  .action-meta {
     @apply text-xs text-muted-foreground;
   }
 
-  .event-status {
-    @apply shrink-0 rounded-md border px-2 py-0.5 text-xs;
+  .action-error {
+    @apply text-xs break-words text-destructive-text;
   }
 
-  .event-status[data-status='succeeded'] {
-    @apply border-emerald-500/40 text-emerald-600 dark:text-emerald-400;
+  .payload-excerpt {
+    @apply m-0 overflow-x-auto rounded-xl bg-muted px-3.5 py-3 font-mono text-xs leading-relaxed tracking-normal whitespace-pre;
   }
 
-  .event-status[data-status='failed'],
-  .event-status[data-status='running'],
-  .event-status[data-status='pending'] {
-    @apply border-amber-500/40 text-amber-600 dark:text-amber-400;
+  .event-detail-foot {
+    @apply mt-auto flex flex-wrap gap-2 border-t px-6 py-4;
+  }
+}
+
+/* Below this width the detail panel stacks under the log instead of squeezing it. */
+@media (max-width: 1100px) {
+  .event-log {
+    @apply flex-col;
   }
 
-  .event-status[data-status='dead'] {
-    @apply border-destructive/40 text-destructive;
+  .event-log-main {
+    @apply pr-8;
   }
 
-  .event-error {
-    @apply truncate font-mono text-xs text-destructive;
+  .event-detail {
+    @apply static max-h-none w-full border-t border-l-0;
   }
 }

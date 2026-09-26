@@ -1,8 +1,12 @@
 import { apiFetch } from '@/lib/api'
-import { type RepositoryList, repositoryListSchema } from './schemas'
+import { type AppInfo, appInfoSchema, type RepositoryList, repositoryListSchema } from './schemas'
 
 export function fetchRepositories(): Promise<RepositoryList> {
   return apiFetch('/repositories', repositoryListSchema)
+}
+
+export function fetchAppInfo(signal?: AbortSignal): Promise<AppInfo> {
+  return apiFetch('/app', appInfoSchema, { signal })
 }
 
 export function syncInstallation(installationId: string): Promise<RepositoryList> {

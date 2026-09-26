@@ -1,0 +1,196 @@
+/* Sidebar + top bar shared by every signed-in page. */
+@layer components {
+  .app-shell {
+    @apply flex min-h-svh;
+  }
+
+  .app-main {
+    @apply flex min-w-0 flex-1 flex-col;
+  }
+
+  .sidebar {
+    @apply sticky top-0 flex h-svh w-64 shrink-0 flex-col gap-6 border-r bg-sidebar px-3 py-4 text-sidebar-foreground;
+  }
+
+  .brand {
+    @apply flex items-center gap-2.5 px-2 py-1;
+  }
+
+  .brand-mark {
+    @apply flex size-8 items-center justify-center rounded-[10px] bg-primary text-primary-foreground;
+  }
+
+  .brand-mark svg {
+    @apply size-[18px];
+  }
+
+  .brand-text {
+    @apply flex flex-col;
+  }
+
+  .brand-name {
+    @apply font-semibold;
+  }
+
+  .brand-tagline {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .side-nav {
+    @apply flex flex-col gap-0.5;
+  }
+
+  .side-nav-heading {
+    @apply px-2.5 pb-1.5 text-xs font-medium text-muted-foreground;
+  }
+
+  .side-link {
+    @apply flex h-9 items-center gap-2.5 rounded-[10px] px-2.5 text-sm font-medium text-foreground hover:bg-sidebar-accent;
+  }
+
+  .side-link svg {
+    @apply size-4 text-muted-foreground;
+  }
+
+  .side-link[aria-current='page'] {
+    @apply bg-muted font-semibold;
+  }
+
+  .side-link[aria-current='page'] svg {
+    @apply text-foreground;
+  }
+
+  .side-badge {
+    @apply ml-auto inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-muted px-2 text-xs font-medium text-muted-foreground;
+  }
+
+  .side-badge[data-tone='destructive'] {
+    @apply bg-destructive/15 text-destructive-text;
+  }
+
+  .sidebar-footer {
+    @apply mt-auto flex flex-col gap-3;
+  }
+
+  .webhook-box {
+    @apply flex flex-col gap-1.5 rounded-xl border p-3;
+  }
+
+  .webhook-title {
+    @apply flex items-center gap-2 text-[13px] font-semibold;
+  }
+
+  .webhook-detail {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .webhook-box[data-health='waiting'] .pulse-dot,
+  .webhook-box[data-health='unknown'] .pulse-dot {
+    @apply bg-muted-foreground;
+    animation: none;
+  }
+
+  .webhook-box[data-health='off'] .pulse-dot {
+    @apply bg-destructive;
+    animation: none;
+  }
+
+  .user-card {
+    @apply flex items-center gap-2.5 px-1.5 py-1;
+  }
+
+  .avatar {
+    @apply flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary object-cover text-xs font-semibold text-secondary-foreground;
+  }
+
+  .user-text {
+    @apply flex min-w-0 flex-1 flex-col;
+  }
+
+  .user-name {
+    @apply truncate text-[13px] font-semibold;
+  }
+
+  .user-handle {
+    @apply truncate text-xs text-muted-foreground;
+  }
+
+  .top-bar {
+    @apply flex h-16 shrink-0 items-center gap-3 border-b px-8;
+  }
+
+  .crumbs {
+    @apply flex items-center gap-2 text-sm;
+  }
+
+  .crumb,
+  .crumb-sep {
+    @apply text-muted-foreground;
+  }
+
+  .crumb-link {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+
+  .crumb-current {
+    @apply font-semibold;
+  }
+
+  .top-bar-actions {
+    @apply ml-auto flex items-center gap-2;
+  }
+
+  .live-pill {
+    @apply inline-flex h-7 items-center gap-1.5 rounded-full bg-accent px-2.5 text-xs font-medium text-accent-foreground;
+  }
+
+  .repo-filter-label {
+    @apply max-w-48 truncate;
+  }
+
+  .repo-filter-search {
+    @apply relative px-1 pb-1;
+  }
+
+  .repo-filter-search > svg {
+    @apply pointer-events-none absolute top-2 left-3.5 size-4 text-muted-foreground;
+  }
+
+  /* Only the list scrolls; the label and search stay pinned. */
+  .repo-filter-list {
+    @apply max-h-72 overflow-y-auto;
+  }
+
+  .repo-filter-empty {
+    @apply px-2 py-4 text-center text-sm text-muted-foreground;
+  }
+}
+
+/* Narrow screens: the sidebar becomes a top strip so pages keep their width. */
+@media (max-width: 900px) {
+  .app-shell {
+    @apply flex-col;
+  }
+
+  .sidebar {
+    @apply static h-auto w-full flex-row flex-wrap items-center gap-3 border-r-0 border-b;
+  }
+
+  .side-nav {
+    @apply flex-row flex-wrap;
+  }
+
+  .side-nav-heading,
+  .webhook-box {
+    @apply hidden;
+  }
+
+  .sidebar-footer {
+    @apply mt-0 ml-auto;
+  }
+
+  .top-bar,
+  .page {
+    @apply px-4;
+  }
+}

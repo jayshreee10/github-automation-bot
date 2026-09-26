@@ -1,0 +1,114 @@
+/* Failures & retries: tiles, failure table, job details and delivery actions. */
+@layer components {
+  .failure-tiles {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-3;
+  }
+
+  .failure-tile {
+    @apply flex flex-col gap-1.5 px-5 py-[18px];
+  }
+
+  .failure-tile-label {
+    @apply text-[13px] font-medium text-muted-foreground;
+  }
+
+  .failure-tile-hint {
+    @apply font-normal;
+  }
+
+  .failure-tile-value {
+    @apply text-[26px] font-semibold tracking-[-0.04em];
+  }
+
+  .failure-tile-value[data-tone='destructive'] {
+    @apply text-destructive-text;
+  }
+
+  .failure-tile-skeleton {
+    @apply h-8 w-12;
+  }
+
+  .failure-row {
+    @apply cursor-pointer;
+  }
+
+  .failure-action {
+    @apply flex items-center gap-2 font-medium whitespace-nowrap;
+  }
+
+  .failure-action-icon {
+    @apply size-4 text-muted-foreground;
+  }
+
+  .failure-more {
+    @apply text-xs font-normal text-muted-foreground;
+  }
+
+  .failure-event {
+    @apply flex max-w-80 flex-col;
+  }
+
+  .failure-title {
+    @apply truncate;
+  }
+
+  .failure-meta {
+    @apply text-muted-foreground;
+  }
+
+  .failure-error-text {
+    @apply max-w-64 truncate;
+  }
+
+  .failure-attempts-head {
+    @apply w-[170px];
+  }
+
+  .failure-attempts {
+    @apply flex items-center gap-2.5;
+  }
+
+  .failure-progress {
+    @apply bg-warn-foreground;
+  }
+
+  .failure-attempts-text {
+    @apply text-[13px] whitespace-nowrap;
+  }
+
+  .failure-next {
+    @apply text-[13px] whitespace-nowrap text-muted-foreground;
+  }
+
+  .failure-retry-cell {
+    @apply text-right;
+  }
+
+  .failure-details {
+    @apply grid grid-cols-1 gap-4 lg:grid-cols-2;
+  }
+
+  .failure-details-head {
+    @apply flex items-center justify-between gap-3;
+  }
+
+  .failure-kv-error {
+    @apply max-w-[60%] truncate text-right;
+  }
+
+  .failure-open-event {
+    @apply self-start;
+  }
+
+  .failure-action-name {
+    @apply flex items-center gap-2;
+  }
+
+  .failure-rule {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .failure-note {
+    @apply text-xs text-muted-foreground;
+  }
+}

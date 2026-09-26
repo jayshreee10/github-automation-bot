@@ -1,25 +1,200 @@
+/* Page scaffolding and small shared pieces from the design: cards, chips, badges, tabs. */
 @layer components {
   .page {
-    @apply mx-auto max-w-4xl px-6 py-10;
+    @apply flex min-w-0 flex-1 flex-col gap-6 px-8 py-7;
+  }
+
+  .page-head {
+    @apply flex flex-wrap items-end gap-4;
+  }
+
+  .page-head-text {
+    @apply flex flex-col gap-1;
+  }
+
+  .page-head-actions {
+    @apply ml-auto flex flex-wrap items-center gap-2;
   }
 
   .page-title {
-    @apply font-heading text-2xl font-semibold tracking-tight;
+    @apply text-2xl font-semibold tracking-[-0.035em];
+  }
+
+  .page-subtitle {
+    @apply text-sm text-muted-foreground;
   }
 
   .section-title {
-    @apply font-heading text-lg font-semibold tracking-tight;
-  }
-
-  .dashboard-header {
-    @apply mb-6 flex items-center justify-between gap-4;
-  }
-
-  .user-badge {
-    @apply text-sm text-muted-foreground;
+    @apply text-base font-semibold tracking-[-0.02em];
   }
 
   .screen-message {
     @apply flex min-h-svh items-center justify-center text-sm text-muted-foreground;
   }
+
+  /* White card with the design's soft shadow and 1rem radius. */
+  .panel {
+    @apply rounded-2xl border bg-card text-card-foreground shadow-card;
+  }
+
+  .panel-padded {
+    @apply flex flex-col gap-3.5 p-5;
+  }
+
+  .panel-head {
+    @apply flex items-center gap-3 px-5 pt-[18px] pb-3.5;
+  }
+
+  .panel-head-text {
+    @apply flex flex-col gap-0.5;
+  }
+
+  .panel-head-actions {
+    @apply ml-auto flex items-center gap-2;
+  }
+
+  /* Tables inside panels: muted header, roomy rows, no outer border. */
+  .data-table {
+    @apply overflow-x-auto;
+  }
+
+  .data-table th {
+    @apply h-10 px-4 text-[13px] font-medium text-muted-foreground;
+  }
+
+  .data-table td {
+    @apply px-4 py-[11px] align-middle;
+  }
+
+  .data-table tr[data-selected='true'] td {
+    @apply bg-muted;
+  }
+
+  .table-skeleton {
+    @apply h-64 w-full rounded-2xl;
+  }
+
+  .empty-card {
+    @apply rounded-2xl border border-dashed;
+  }
+
+  .chip {
+    @apply inline-flex h-6 items-center gap-1.5 rounded-lg bg-muted px-2 text-xs font-medium whitespace-nowrap;
+  }
+
+  .chip[data-mono] {
+    @apply font-mono;
+  }
+
+  .chip-row {
+    @apply flex flex-wrap items-center gap-1.5;
+  }
+
+  .mono {
+    @apply font-mono text-xs tracking-normal;
+  }
+
+  .segmented {
+    @apply inline-flex w-fit gap-0.5 rounded-xl bg-muted p-1;
+  }
+
+  .segment {
+    @apply inline-flex h-[30px] items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium text-muted-foreground;
+  }
+
+  .segment[aria-checked='true'] {
+    @apply bg-card text-foreground shadow-card;
+  }
+
+  .segment-count {
+    @apply text-xs text-muted-foreground;
+  }
+
+  /* Key/value rows, e.g. the job queue and delivery details. */
+  .kv {
+    @apply flex items-center justify-between gap-4 border-b py-[9px] text-[13px] last:border-b-0;
+  }
+
+  .kv-key {
+    @apply text-muted-foreground;
+  }
+
+  .kv-value {
+    @apply font-semibold;
+  }
+
+  .progress {
+    @apply h-1.5 w-full overflow-hidden rounded-full bg-muted;
+  }
+
+  .progress-bar {
+    @apply block h-full rounded-full bg-primary;
+  }
+
+  .search-input {
+    @apply relative flex items-center;
+  }
+
+  .search-input > svg {
+    @apply pointer-events-none absolute left-3 size-4 text-muted-foreground;
+  }
+
+  .row-actions {
+    @apply flex items-center justify-end gap-1;
+  }
+
+  .visually-hidden {
+    @apply sr-only;
+  }
+
+  .pulse-dot {
+    @apply inline-block size-2 shrink-0 rounded-full bg-chart-3;
+    animation: pulse-ring 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--chart-3) 60%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot {
+    animation: none;
+  }
+}
+
+/* Unlayered: the shadcn Input's own padding utility would beat a layered rule. */
+.search-input > input {
+  @apply pl-9;
+}
+
+/* Unlayered on purpose: layered rules lose to component utility classes, so tone colours sit outside @layer. */
+.status-badge {
+  @apply inline-flex h-[22px] items-center gap-1 rounded-full border border-transparent px-2 text-xs font-medium whitespace-nowrap;
+}
+
+.status-badge[data-tone='success'] {
+  @apply bg-accent text-accent-foreground;
+}
+
+.status-badge[data-tone='warn'] {
+  @apply bg-warn text-warn-foreground;
+}
+
+.status-badge[data-tone='destructive'] {
+  @apply bg-destructive/15 text-destructive-text;
+}
+
+.status-badge[data-tone='muted'] {
+  @apply bg-muted text-muted-foreground;
+}
+
+.status-badge[data-tone='outline'] {
+  @apply border-border text-foreground;
 }

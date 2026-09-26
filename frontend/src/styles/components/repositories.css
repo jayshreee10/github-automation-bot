@@ -1,45 +1,118 @@
+/* Repositories page: installation cards, add-account card, App permissions and events. */
 @layer components {
-  .repo-section {
-    @apply mt-8 flex flex-col gap-4;
+  .repos-layout {
+    @apply grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px];
   }
 
-  .repo-header {
-    @apply flex items-center justify-between gap-4;
+  .repos-main,
+  .repos-side {
+    @apply flex min-w-0 flex-col gap-4;
   }
 
-  .repo-group {
-    @apply rounded-xl border bg-card text-card-foreground;
+  .installation-card {
+    @apply overflow-hidden;
   }
 
-  .repo-group-header {
-    @apply flex items-center justify-between gap-4 border-b px-4 py-3;
+  .installation-head {
+    @apply flex flex-wrap items-center gap-3 border-b px-5 py-4;
   }
 
-  .repo-group-actions {
-    @apply flex items-center gap-2;
+  .installation-avatar {
+    @apply flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-secondary text-xs font-semibold text-secondary-foreground;
   }
 
-  .repo-account {
-    @apply text-sm font-medium;
+  .installation-text {
+    @apply flex min-w-0 flex-col;
   }
 
-  .repo-list {
-    @apply divide-y;
+  .installation-login {
+    @apply font-semibold;
   }
 
-  .repo-item {
-    @apply flex items-center justify-between gap-4 px-4 py-3;
+  .installation-detail {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .installation-configure {
+    @apply ml-auto;
+  }
+
+  .installation-empty {
+    @apply px-5 py-4 text-sm text-muted-foreground;
+  }
+
+  .repo-cell {
+    @apply flex flex-col;
   }
 
   .repo-name {
-    @apply text-sm font-medium hover:underline;
+    @apply font-medium hover:underline;
   }
 
-  .repo-empty {
-    @apply px-4 py-3 text-sm text-muted-foreground;
+  .repo-meta,
+  .repo-last-event {
+    @apply text-xs text-muted-foreground;
   }
 
-  .repo-badge {
-    @apply rounded-md border px-2 py-0.5 text-xs text-muted-foreground;
+  .repo-last-event {
+    @apply text-sm;
+  }
+
+  .repo-status-head,
+  .repo-status-cell {
+    @apply text-right;
+  }
+
+  .add-account {
+    @apply flex flex-wrap items-center gap-4 rounded-2xl border border-dashed p-5;
+  }
+
+  .add-account-icon {
+    @apply flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted;
+  }
+
+  .add-account-icon svg {
+    @apply size-4;
+  }
+
+  .add-account-text {
+    @apply flex min-w-0 flex-1 flex-col gap-0.5;
+  }
+
+  .add-account-title {
+    @apply font-semibold;
+  }
+
+  .add-account-note,
+  .app-details-note {
+    @apply text-[13px] text-muted-foreground;
+  }
+
+  .add-account-action {
+    @apply ml-auto;
+  }
+
+  .app-details-skeleton {
+    @apply h-24 w-full rounded-xl;
+  }
+
+  .event-list {
+    @apply flex flex-col gap-2.5 text-[13px];
+  }
+
+  .event-list-item {
+    @apply flex items-center gap-2.5;
+  }
+
+  .event-list-item svg {
+    @apply size-4 text-accent-foreground;
+  }
+
+  .event-list-note {
+    @apply ml-auto text-muted-foreground;
+  }
+
+  .sync-spin {
+    @apply animate-spin;
   }
 }

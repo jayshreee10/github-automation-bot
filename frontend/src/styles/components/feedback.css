@@ -7,4 +7,21 @@
   .muted-text {
     @apply text-sm text-muted-foreground;
   }
+
+  /* Route error screen inside the shell: fills the main column beside the sidebar. */
+  .error-screen {
+    @apply flex flex-1 items-center justify-center px-6 py-10;
+  }
+
+  .error-card {
+    @apply max-w-lg flex-none;
+  }
+
+  .error-detail {
+    @apply max-h-40 w-full overflow-auto rounded-lg bg-muted p-3 text-left font-mono text-xs whitespace-pre-wrap text-muted-foreground;
+  }
+
+  .error-actions {
+    @apply flex-row justify-center;
+  }
 }

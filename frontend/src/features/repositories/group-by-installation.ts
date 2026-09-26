@@ -1,12 +1,11 @@
-import type { Repository, RepositoryList } from './schemas'
+import type { Installation, Repository, RepositoryList } from './schemas'
 
-export type InstallationGroupData = { installationId: string; accountLogin: string; repos: Repository[] }
+export type InstallationGroupData = { installation: Installation; repos: Repository[] }
 
-// Every installation gets a group, even with zero repos, so Sync / Manage stay reachable.
+// Every installation gets a group, even with zero repos, so Configure stays reachable.
 export function groupByInstallation(data: RepositoryList): InstallationGroupData[] {
-  return data.installations.map((i) => ({
-    installationId: i.id,
-    accountLogin: i.accountLogin,
-    repos: data.repositories.filter((r) => r.installationId === i.id),
+  return data.installations.map((installation) => ({
+    installation,
+    repos: data.repositories.filter((r) => r.installationId === installation.id),
   }))
 }

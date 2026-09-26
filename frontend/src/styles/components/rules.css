@@ -1,0 +1,221 @@
+/* Rules list and rule editor (design screens 05 and 06). */
+@layer components {
+  .rules-toolbar {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .rules-search {
+    @apply ml-auto w-full max-w-[260px];
+  }
+
+  .rules-table {
+    @apply overflow-hidden;
+  }
+
+  .col-switch {
+    @apply w-[60px];
+  }
+
+  .col-menu {
+    @apply w-14;
+  }
+
+  .rule-row[data-disabled] > td:not(:first-child) {
+    @apply opacity-60;
+  }
+
+  .rule-cell,
+  .rule-keys,
+  .rule-fired {
+    @apply flex flex-col;
+  }
+
+  .rule-name {
+    @apply font-semibold text-foreground no-underline hover:text-muted-foreground;
+  }
+
+  .rule-repo,
+  .rule-fired-when {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .rule-if {
+    @apply max-w-80 text-[13px];
+  }
+
+  .rule-if[data-empty] {
+    @apply text-muted-foreground;
+  }
+
+  .rules-note {
+    @apply flex items-center gap-3 rounded-[14px] bg-accent px-4 py-3.5 text-[13px] text-accent-foreground;
+  }
+
+  .rules-note svg {
+    @apply size-4 shrink-0;
+  }
+
+  /* Editor: main column of cards, 400px summary column on the right. */
+  .rule-editor {
+    @apply grid items-start gap-5 px-8 py-6 lg:grid-cols-[minmax(0,1fr)_400px];
+  }
+
+  .editor-main,
+  .editor-side {
+    @apply flex min-w-0 flex-col gap-4;
+  }
+
+  .editor-basics {
+    @apply grid gap-4 p-5 sm:grid-cols-2;
+  }
+
+  .editor-field {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .field-label {
+    @apply text-sm font-medium;
+  }
+
+  .editor-select {
+    @apply h-9 w-full rounded-xl bg-card;
+  }
+
+  .editor-card {
+    @apply flex flex-col gap-3.5 p-5;
+  }
+
+  .editor-card-head {
+    @apply flex flex-wrap items-center gap-2.5;
+  }
+
+  .step-badge {
+    @apply inline-flex h-[22px] items-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground;
+  }
+
+  .match-select {
+    @apply h-7 rounded-[10px] bg-card;
+  }
+
+  .event-options {
+    @apply grid gap-2.5 sm:grid-cols-3;
+  }
+
+  .event-option {
+    @apply flex flex-col items-start gap-1 rounded-xl border bg-card px-3.5 py-3 text-left hover:bg-muted;
+  }
+
+  .event-option[aria-pressed='true'] {
+    @apply border-primary bg-accent ring-1 ring-primary;
+  }
+
+  .event-option-title {
+    @apply flex items-center gap-2 font-semibold;
+  }
+
+  .event-option-title svg {
+    @apply size-4;
+  }
+
+  .condition-rows {
+    @apply flex flex-col gap-2;
+  }
+
+  .condition-row {
+    @apply grid items-center gap-2 sm:grid-cols-[160px_150px_minmax(0,1fr)_32px];
+  }
+
+  .condition-select {
+    @apply h-9 w-full rounded-xl bg-card;
+  }
+
+  .condition-footer {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .hint-text {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .chip-input {
+    @apply flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-xl border border-input bg-card px-2 py-1 focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50;
+  }
+
+  .chip-input[data-invalid] {
+    @apply border-destructive;
+  }
+
+  .chip-input[data-disabled] {
+    @apply opacity-50;
+  }
+
+  .chip-input-chip {
+    @apply inline-flex h-[22px] items-center gap-1 rounded-lg bg-muted pr-1 pl-2 text-xs font-medium;
+  }
+
+  .chip-input-remove {
+    @apply inline-flex size-4 items-center justify-center rounded text-muted-foreground hover:text-foreground;
+  }
+
+  .chip-input-remove svg {
+    @apply size-3;
+  }
+
+  .chip-input-field {
+    @apply h-7 min-w-24 flex-1 bg-transparent px-1 text-sm outline-none placeholder:text-muted-foreground;
+  }
+
+  .then-row {
+    @apply flex flex-wrap items-center gap-3 rounded-xl border px-3.5 py-3;
+  }
+
+  .then-name {
+    @apply w-40 font-medium;
+  }
+
+  .then-hint {
+    @apply text-[13px] text-muted-foreground;
+  }
+
+  .then-row .chip-input,
+  .then-comment {
+    @apply min-w-60 flex-1;
+  }
+
+  .then-comment {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .rule-summary {
+    @apply text-sm leading-relaxed;
+  }
+
+  .enabled-card {
+    @apply flex items-center gap-3 px-5 py-4;
+  }
+
+  .enabled-text {
+    @apply mr-auto flex flex-col gap-0.5;
+  }
+
+  .enabled-title {
+    @apply font-semibold;
+  }
+
+  .delete-rule {
+    @apply self-start text-destructive-text hover:text-destructive-text;
+  }
+
+  .unsaved-text {
+    @apply text-[13px] text-muted-foreground;
+  }
+
+  .editor-skeleton {
+    @apply h-96 w-full rounded-2xl;
+  }
+}
+
+/* Unlayered: the shadcn TableCell's whitespace-nowrap utility would beat a layered rule. */
+.rule-if {
+  @apply whitespace-normal;
+}

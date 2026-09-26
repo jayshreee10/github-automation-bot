@@ -1,15 +1,83 @@
-/* Centered card screens: sign-in and the GitHub setup callback. */
+/* Sign-in split screen, plus the centred card used by the GitHub setup callback. */
 @layer components {
   .auth-screen {
     @apply flex min-h-svh items-center justify-center px-6;
   }
 
+  .login-screen {
+    @apply grid min-h-svh grid-cols-1 lg:grid-cols-2;
+  }
+
+  .login-brand {
+    @apply relative flex flex-col gap-10 overflow-hidden bg-secondary px-8 py-10 text-secondary-foreground lg:px-16 lg:py-14;
+  }
+
+  .login-logo {
+    @apply flex items-center gap-3 text-lg font-semibold tracking-[-0.02em];
+  }
+
+  .login-logo-mark {
+    @apply flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground;
+  }
+
+  .login-pitch {
+    @apply mt-auto flex max-w-[520px] flex-col gap-5;
+  }
+
+  .login-headline {
+    @apply text-4xl leading-[1.05] font-bold tracking-[-0.045em] lg:text-5xl;
+  }
+
+  .login-headline-accent {
+    @apply text-primary;
+  }
+
+  .login-lead {
+    @apply text-[17px] leading-[1.55] opacity-80;
+  }
+
+  .login-steps {
+    @apply flex max-w-[520px] flex-col gap-3;
+  }
+
+  .login-step {
+    @apply flex items-center gap-3.5 rounded-[14px] border border-white/8 bg-white/6 px-4 py-3.5;
+  }
+
+  .login-step-number {
+    @apply flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/12 text-[13px] font-semibold;
+  }
+
+  .login-step:first-child .login-step-number {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .login-step-title {
+    @apply font-semibold;
+  }
+
+  .login-step-detail {
+    @apply opacity-70;
+  }
+
+  .login-events {
+    @apply font-mono text-xs opacity-55;
+  }
+
+  .login-panel {
+    @apply flex items-center justify-center p-6 lg:p-12;
+  }
+
   .login-card {
-    @apply flex w-full max-w-sm flex-col gap-4 rounded-xl border bg-card p-8 text-card-foreground shadow-sm;
+    @apply flex w-full max-w-[420px] flex-col gap-6 rounded-2xl border bg-card p-9 text-card-foreground shadow-card;
+  }
+
+  .login-card-head {
+    @apply flex flex-col gap-1.5;
   }
 
   .login-title {
-    @apply font-heading text-xl font-semibold tracking-tight;
+    @apply text-[26px] font-semibold tracking-[-0.035em];
   }
 
   .login-subtitle {
@@ -20,8 +88,29 @@
     @apply w-full;
   }
 
+  .login-divider {
+    @apply flex items-center gap-3 text-xs text-muted-foreground;
+  }
+
+  .login-divider::before,
+  .login-divider::after {
+    @apply h-px flex-1 bg-border content-[''];
+  }
+
+  .login-notes {
+    @apply flex flex-col gap-2.5 text-[13px];
+  }
+
+  .login-note {
+    @apply flex items-start gap-2.5;
+  }
+
+  .login-note svg {
+    @apply mt-0.5 size-4 shrink-0 text-accent-foreground;
+  }
+
   .setup-card {
-    @apply flex w-full max-w-sm flex-col items-center gap-4 rounded-xl border bg-card p-8 text-center text-card-foreground shadow-sm;
+    @apply flex w-full max-w-sm flex-col items-center gap-4 rounded-2xl border bg-card p-8 text-center text-card-foreground shadow-card;
   }
 
   .setup-link {
