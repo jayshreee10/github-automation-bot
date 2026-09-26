@@ -34,7 +34,7 @@ const issuesPayload = (login = 'alice', title = 'bug: crash') => ({
 function setup(rules: ActiveRule[] = []) {
   const registry = new HandlerRegistry();
   const service = { findActive: vi.fn().mockResolvedValue(rules) };
-  const actions = { installationIdFor: vi.fn().mockResolvedValue(5) };
+  const actions = { installationFor: vi.fn().mockResolvedValue({ id: 5, ownerId: 'user-1' }) };
   const runner = { run: vi.fn().mockResolvedValue('succeeded') };
   const handler = new RulesEventHandler(
     registry,
@@ -67,7 +67,7 @@ describe('RulesEventHandler', () => {
       ['r-bug', 'add_label'],
       ['r-bug', 'slack_notify'],
     ]);
-    expect(runner.run.mock.calls[0][0]).toMatchObject({ installationId: 5, ruleName: 'r-bug' });
+    expect(runner.run.mock.calls[0][0]).toMatchObject({ installationId: 5, ownerId: 'user-1', ruleName: 'r-bug' });
   });
 
   it('skips deliveries for repos that were never connected', async () => {
@@ -78,7 +78,7 @@ describe('RulesEventHandler', () => {
 
   it('skips repos disconnected since the delivery arrived', async () => {
     const { handler, actions, service } = setup();
-    actions.installationIdFor.mockResolvedValue(null);
+    actions.installationFor.mockResolvedValue(null);
     await handler.handle(delivery({ payload: issuesPayload() }));
     expect(service.findActive).not.toHaveBeenCalled();
   });
@@ -86,7 +86,7 @@ describe('RulesEventHandler', () => {
   it('ignores events sent by the bot itself (loop guard)', async () => {
     const { handler, runner, actions } = setup([rule('r', [], [{ type: 'slack_notify' }])]);
     await handler.handle(delivery({ payload: issuesPayload('my-bot[bot]') }));
-    expect(actions.installationIdFor).not.toHaveBeenCalled();
+    expect(actions.installationFor).not.toHaveBeenCalled();
     expect(runner.run).not.toHaveBeenCalled();
   });
 

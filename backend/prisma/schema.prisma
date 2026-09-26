@@ -148,3 +148,15 @@ model RedeliveryRequest {
   @@index([requestedAt])
   @@map("redelivery_requests")
 }
+
+/// Per-user Slack settings. The webhook URL is AES-256-GCM encrypted; only its last 4 characters are kept in clear.
+model SlackSettings {
+  userId        String   @id @map("user_id")
+  webhookCipher String?  @map("webhook_cipher") /// v1:iv:tag:ciphertext, base64 parts
+  webhookLast4  String?  @map("webhook_last4")
+  channelLabel  String?  @map("channel_label")
+  includeLink   Boolean  @default(true) @map("include_link")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("slack_settings")
+}

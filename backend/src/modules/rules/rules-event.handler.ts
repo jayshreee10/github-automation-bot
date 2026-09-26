@@ -43,10 +43,10 @@ export class RulesEventHandler implements JobHandler, OnModuleInit {
       this.logger.log(`${tag}: sent by the bot, skipped`);
       return;
     }
-    const installationId = await this.actions.installationIdFor(
+    const installation = await this.actions.installationFor(
       delivery.repositoryId,
     );
-    if (installationId === null) {
+    if (installation === null) {
       this.logger.log(`${tag}: repository no longer connected, skipped`);
       return;
     }
@@ -62,7 +62,8 @@ export class RulesEventHandler implements JobHandler, OnModuleInit {
     for (const rule of matched) {
       const ctx = {
         event,
-        installationId,
+        installationId: installation.id,
+        ownerId: installation.ownerId,
         ruleId: rule.id,
         ruleName: rule.name,
       };

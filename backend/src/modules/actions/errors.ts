@@ -1,5 +1,6 @@
 import { redact } from '../../core/logger/redact.js';
 import { GithubApiError } from '../github/github-client.js';
+import { SlackApiError } from '../slack/slack-webhook.js';
 
 // Retrying later may succeed (network, 5xx, rate limit): the action stays pending and the job retries.
 export class TransientActionError extends Error {
@@ -14,14 +15,6 @@ export class PermanentActionError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'PermanentActionError';
-  }
-}
-
-// Slack Incoming Webhook failure; only the status is kept, the URL is a secret.
-export class SlackApiError extends Error {
-  constructor(readonly status: number) {
-    super(`Slack webhook ${status}`);
-    this.name = 'SlackApiError';
   }
 }
 

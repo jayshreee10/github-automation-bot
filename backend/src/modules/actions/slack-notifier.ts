@@ -1,43 +1,53 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '../../core/config/config.service.js';
 import type { RepoEvent } from '../events/repo-event.js';
-import { PermanentActionError, SlackApiError } from './errors.js';
+import { SecretBoxError } from '../slack/secret-box.js';
+import {
+  SlackSettingsService,
+  type SlackTarget,
+} from '../slack/slack-settings.service.js';
+import { escapeSlack, postToSlack } from '../slack/slack-webhook.js';
+import { PermanentActionError } from './errors.js';
 
-// Slack treats &, < and > as control characters; escaping them stops payload text like <!channel> pinging anyone.
-export function escapeSlack(text: string): string {
-  return text
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;');
-}
-
-// Posts one Block Kit message per matched rule through the workspace Incoming Webhook.
+// Posts one Block Kit message per matched rule to the webhook the repo owner saved in Settings.
 @Injectable()
 export class SlackNotifier {
-  private readonly url: string | undefined;
+  constructor(private readonly settings: SlackSettingsService) {}
 
-  constructor(config: ConfigService) {
-    this.url = config.get('SLACK_WEBHOOK_URL');
+  async notify(
+    event: RepoEvent,
+    ruleName: string,
+    ownerId: string,
+  ): Promise<void> {
+    const target = await this.targetFor(ownerId);
+    await postToSlack(target.url, message(event, ruleName, target));
   }
 
-  async notify(event: RepoEvent, ruleName: string): Promise<void> {
-    if (!this.url)
-      throw new PermanentActionError('SLACK_WEBHOOK_URL is not configured');
-    const res = await fetch(this.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(message(event, ruleName)),
-      signal: AbortSignal.timeout(5_000),
-    });
-    if (!res.ok) throw new SlackApiError(res.status);
+  // Missing or undecryptable config will not fix itself on retry, so both fail permanently.
+  private async targetFor(ownerId: string): Promise<SlackTarget> {
+    let target: SlackTarget | null;
+    try {
+      target = await this.settings.target(ownerId);
+    } catch (err) {
+      if (err instanceof SecretBoxError)
+        throw new PermanentActionError(
+          `Slack webhook unusable: ${err.message}`,
+        );
+      throw err;
+    }
+    if (!target)
+      throw new PermanentActionError(
+        'no Slack webhook saved; add one in Settings',
+      );
+    return target;
   }
 }
 
-function message(event: RepoEvent, ruleName: string) {
+function message(event: RepoEvent, ruleName: string, target: SlackTarget) {
   const kind = event.action ? `${event.event}.${event.action}` : event.event;
   const label = event.number ? `#${event.number} ${event.title}` : event.title;
   const title = escapeSlack(label || '(no title)');
-  const link = event.url ? `<${event.url}|${title}>` : title;
+  const link =
+    event.url && target.includeLink ? `<${event.url}|${title}>` : title;
   const text = `${escapeSlack(event.repository.fullName)}: ${title}`;
   return {
     text,

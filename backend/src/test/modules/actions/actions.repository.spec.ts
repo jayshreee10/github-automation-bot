@@ -31,10 +31,12 @@ describe('ActionsRepository', () => {
     expect(action.update).toHaveBeenCalledWith({ where: { id: 'a1' }, data: { status, error: 'err', durationMs: 120 } });
   });
 
-  it('installationIdFor returns a number, or null for an unknown repo', async () => {
+  it('installationFor returns the id and owner, or null for an unknown repo', async () => {
     const { repo, repository } = setup();
-    repository.findUnique.mockResolvedValueOnce({ installationId: 5n }).mockResolvedValueOnce(null);
-    await expect(repo.installationIdFor(42n)).resolves.toBe(5);
-    await expect(repo.installationIdFor(43n)).resolves.toBeNull();
+    repository.findUnique
+      .mockResolvedValueOnce({ installation: { id: 5n, userId: 'user-1' } })
+      .mockResolvedValueOnce(null);
+    await expect(repo.installationFor(42n)).resolves.toEqual({ id: 5, ownerId: 'user-1' });
+    await expect(repo.installationFor(43n)).resolves.toBeNull();
   });
 });

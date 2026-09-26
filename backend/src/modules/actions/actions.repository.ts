@@ -62,11 +62,15 @@ export class ActionsRepository {
     });
   }
 
-  async installationIdFor(repositoryId: bigint): Promise<number | null> {
+  async installationFor(
+    repositoryId: bigint,
+  ): Promise<{ id: number; ownerId: string } | null> {
     const row = await this.prisma.repository.findUnique({
       where: { id: repositoryId },
-      select: { installationId: true },
+      select: { installation: { select: { id: true, userId: true } } },
     });
-    return row ? Number(row.installationId) : null;
+    return row
+      ? { id: Number(row.installation.id), ownerId: row.installation.userId }
+      : null;
   }
 }

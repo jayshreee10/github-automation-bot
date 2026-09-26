@@ -16,10 +16,11 @@ const VALID: Record<string, string> = {
   GITHUB_APP_SLUG: 'my-bot',
   GITHUB_APP_PRIVATE_KEY: PEM_B64,
   GITHUB_WEBHOOK_SECRET: 'w'.repeat(40),
+  SETTINGS_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString('base64'),
 };
 
 function stubEnv(values: Record<string, string | undefined>) {
-  for (const key of ['NODE_ENV', 'PORT', 'SLACK_WEBHOOK_URL', 'SMEE_URL'])
+  for (const key of ['NODE_ENV', 'PORT', 'SMEE_URL'])
     vi.stubEnv(key, undefined);
   for (const [key, value] of Object.entries({ ...VALID, ...values }))
     vi.stubEnv(key, value);
@@ -43,7 +44,6 @@ describe('loadEnv', () => {
     expect(env.PORT).toBe(4000);
     expect(env.GITHUB_APP_ID).toBe(12345);
     expect(env.GITHUB_APP_PRIVATE_KEY.type).toBe('private');
-    expect(env.SLACK_WEBHOOK_URL).toBeUndefined();
     expect(Object.isFrozen(env)).toBe(true);
   });
 
@@ -53,9 +53,10 @@ describe('loadEnv', () => {
     expect(mod.loadEnv()).toBe(mod.loadEnv());
   });
 
-  it('treats an empty SLACK_WEBHOOK_URL as unset', async () => {
-    stubEnv({ SLACK_WEBHOOK_URL: '' });
-    expect((await load()).SLACK_WEBHOOK_URL).toBeUndefined();
+
+  it('decodes SETTINGS_ENCRYPTION_KEY to 32 bytes', async () => {
+    stubEnv({ SETTINGS_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString('base64') });
+    expect((await load()).SETTINGS_ENCRYPTION_KEY).toEqual(Buffer.alloc(32, 7));
   });
 
   it('registers the webhook secret for log redaction', async () => {
@@ -71,7 +72,8 @@ describe('loadEnv', () => {
     ['GITHUB_APP_SLUG', 'Bad Slug'],
     ['GITHUB_APP_PRIVATE_KEY', Buffer.from('not a key').toString('base64')],
     ['GITHUB_WEBHOOK_SECRET', 'too-short'],
-    ['SLACK_WEBHOOK_URL', 'https://evil.example.com/services/x'],
+    ['SETTINGS_ENCRYPTION_KEY', Buffer.alloc(16).toString('base64')],
+    ['SETTINGS_ENCRYPTION_KEY', undefined],
     ['GITHUB_APP_ID', undefined],
   ])('exits listing only the name when %s is invalid', async (name, value) => {
     stubEnv({ [name]: value });

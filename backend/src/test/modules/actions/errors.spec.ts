@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { GithubApiError } from '../../../modules/github/github-client.js';
-import { PermanentActionError, SlackApiError, TransientActionError, toActionError } from '../../../modules/actions/errors.js';
+import { PermanentActionError, TransientActionError, toActionError } from '../../../modules/actions/errors.js';
+import { SlackApiError } from '../../../modules/slack/slack-webhook.js';
 
 describe('toActionError', () => {
   it.each([

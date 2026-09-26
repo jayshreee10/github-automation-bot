@@ -13,6 +13,8 @@ const COMMENT_LOOKBACK_MS = 60_000;
 export interface ActionContext {
   event: RepoEvent;
   installationId: number;
+  // Installation owner; their Slack settings decide where notifications go.
+  ownerId: string;
   ruleId: string;
   ruleName: string;
 }
@@ -84,7 +86,7 @@ export class ActionRunner {
         return this.github.addComment(ref, body);
       }
       case 'slack_notify':
-        await this.slack.notify(ctx.event, ctx.ruleName);
+        await this.slack.notify(ctx.event, ctx.ruleName, ctx.ownerId);
         return {};
     }
   }

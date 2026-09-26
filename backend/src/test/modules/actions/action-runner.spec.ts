@@ -3,14 +3,15 @@ import { repoEvent } from '../../fakes.js';
 import { GithubApiError } from '../../../modules/github/github-client.js';
 import { type ActionContext, ActionRunner } from '../../../modules/actions/action-runner.js';
 import type { ActionsRepository } from '../../../modules/actions/actions.repository.js';
-import { SlackApiError } from '../../../modules/actions/errors.js';
 import type { GithubActions } from '../../../modules/actions/github-actions.js';
 import type { SlackNotifier } from '../../../modules/actions/slack-notifier.js';
+import { SlackApiError } from '../../../modules/slack/slack-webhook.js';
 
 const CREATED = new Date('2026-01-01T00:10:00Z');
 const ctx = (overrides: Partial<ActionContext> = {}): ActionContext => ({
   event: repoEvent({ deliveryId: 'd1' }),
   installationId: 5,
+  ownerId: 'user-1',
   ruleId: 'r1',
   ruleName: 'Bugs',
   ...overrides,
@@ -92,7 +93,7 @@ describe('ActionRunner', () => {
   it('sends Slack notifications with the rule name', async () => {
     const { runner, slack } = setup();
     await runner.run(ctx(), { type: 'slack_notify' });
-    expect(slack.notify).toHaveBeenCalledWith(ctx().event, 'Bugs');
+    expect(slack.notify).toHaveBeenCalledWith(ctx().event, 'Bugs', 'user-1');
   });
 
   it('a transient failure keeps the action pending and asks for a retry', async () => {

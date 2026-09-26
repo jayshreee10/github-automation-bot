@@ -15,6 +15,7 @@ import { HealthModule } from './modules/health/health.module.js';
 import { InstallationsModule } from './modules/installations/installations.module.js';
 import { QueueModule } from './modules/queue/queue.module.js';
 import { RulesModule } from './modules/rules/rules.module.js';
+import { SlackModule } from './modules/slack/slack.module.js';
 import { WebhooksModule } from './modules/webhooks/webhooks.module.js';
 
 // Composition root: core infrastructure first, then feature modules.
@@ -32,6 +33,7 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module.js';
     EventsModule,
     FailuresModule,
     RulesModule,
+    SlackModule,
     WebhooksModule,
   ],
 })
