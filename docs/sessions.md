@@ -43,22 +43,35 @@ See [`tech-stack.md`](tech-stack.md) for the stack, versions, conventions and ex
 backend/              NestJS
   prisma/             schema.prisma, migrations/
   src/
-    config/           zod env schema, fail fast on boot
-    common/           logger (structured, redacts secrets), guards, pipes
-    prisma/           PrismaService
-    auth/             Neon Auth JWT guard (JWKS), current-user decorator
-    github/           App JWT, installation tokens, REST client
-    webhooks/         signature verify, dedupe, persist, enqueue
-    queue/            job claim, retry/backoff, worker loop
-    rules/            rule CRUD + pure matcher
-    actions/          label, comment, slack (ai-triage later, Session 7)
-    dashboard/        read APIs for events, actions, failures
+    main.ts           bootstrap; app.module.ts is the composition root
+    core/             cross-cutting infrastructure, no feature logic
+      config/         zod env schema, fail fast on boot
+      database/       PrismaService
+      logger/         structured logger, redacts secrets
+      errors/         domain errors + global filter mapping them to HTTP
+      swagger.ts      dev-only API docs
+    modules/          one folder per feature: module, controller, service, *.repository.ts (all SQL)
+      auth/           Neon Auth JWT guard (JWKS), current-user decorator, @Public()
+      health/         GET /api/health
+      github/         App JWT, installation tokens, REST client
+      users/          GitHub identity lookup (neon_auth, read-only)
+      installations/  connect / sync / list repos, installation webhooks
+      webhooks/       signature verify, dedupe, persist + enqueue, catch-up
+      queue/          handler registry, job claim, retry/backoff, worker loop
+      events/         repo event normalising, events API
+      rules/          rule CRUD + pure matcher (phase 4)
+      actions/        label, comment, slack (phase 4; ai-triage later, Session 7)
 frontend/             React + Vite
   src/
-    pages/            login, dashboard, rules, failures
-    components/       app components
+    app/              app root and router
+    features/         one folder per feature: api.ts, schemas.ts, use-*.ts hooks, components, pages
+      auth/           login page, protected route, session hooks
+      dashboard/      dashboard page (composes other features)
+      repositories/   repo list, installation groups, GitHub setup callback
+      events/         event log, webhook status
+    hooks/            shared hooks (visibility-aware polling)
     components/ui/    shadcn/ui (generated)
-    lib/              Neon Auth client, api client (attaches JWT), utils
+    lib/              Neon Auth client, api client (attaches JWT), env, utils
     styles/           globals.css entry + shadcn theme, components/*.css (@apply)
 docs/                 prd.md, sessions.md, commands.md, tech-stack.md, ai-log.md, phase/
 CLAUDE.md  AGENTS.md  AI_NOTES.md  README.md  .env.example
