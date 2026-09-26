@@ -19,3 +19,24 @@ export class UpstreamUnavailableError extends DomainError {
     super(message);
   }
 }
+
+// Unknown or not the caller's: both return 404 so resource ids owned by others are not revealed.
+export class NotFoundError extends DomainError {
+  constructor(message = 'not found') {
+    super(message);
+  }
+}
+
+// The resource exists but its current state forbids the request, e.g. retrying a job that is not failed.
+export class ConflictError extends DomainError {
+  constructor(message = 'conflict') {
+    super(message);
+  }
+}
+
+// Input passed schema checks alone but breaks a rule once combined with stored state.
+export class InvalidInputError extends DomainError {
+  constructor(message = 'invalid input') {
+    super(message);
+  }
+}

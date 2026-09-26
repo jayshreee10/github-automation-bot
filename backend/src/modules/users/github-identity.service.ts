@@ -14,4 +14,15 @@ export class GithubIdentityService {
     const id = Number(rows[0]?.accountId);
     return Number.isSafeInteger(id) && id > 0 ? id : null;
   }
+
+  // The login of the caller's own personal installation (connect only accepts those), so no GitHub call.
+  async githubLogin(neonUserId: string): Promise<string | null> {
+    const rows = await this.prisma.$queryRaw<{ login: string }[]>`
+      SELECT i.github_account_login AS login
+      FROM neon_auth.account a
+      JOIN installations i ON i.github_account_id::text = a."accountId"
+      WHERE a."userId"::text = ${neonUserId} AND a."providerId" = 'github'
+      LIMIT 1`;
+    return rows[0]?.login ?? null;
+  }
 }

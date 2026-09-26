@@ -10,6 +10,7 @@ export const githubAccountSchema = z.object({
 export const githubInstallationSchema = z.object({
   id: z.number(),
   account: githubAccountSchema,
+  repository_selection: z.enum(['all', 'selected']).nullish(),
 });
 
 export const installationTokenSchema = z.object({
@@ -21,6 +22,7 @@ export const githubRepositorySchema = z.object({
   id: z.number(),
   full_name: z.string(),
   private: z.boolean(),
+  default_branch: z.string().nullish(),
 });
 
 export const installationReposPageSchema = z.object({
@@ -44,6 +46,13 @@ export const hookConfigSchema = z.object({
   content_type: z.string().nullish(),
 });
 
+// The App's granted permissions (e.g. issues: write) and subscribed webhook events.
+export const githubAppSchema = z.object({
+  events: z.array(z.string()),
+  permissions: z.record(z.string(), z.string()),
+});
+
+export type GithubApp = z.infer<typeof githubAppSchema>;
 export type GithubHookDelivery = z.infer<typeof hookDeliverySchema>;
 export type GithubInstallation = z.infer<typeof githubInstallationSchema>;
 export type GithubRepository = z.infer<typeof githubRepositorySchema>;

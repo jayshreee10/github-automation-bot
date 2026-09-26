@@ -7,7 +7,9 @@ import {
 } from './github-client.js';
 import { GithubAppService } from './github-app.service.js';
 import {
+  type GithubApp,
   type GithubHookDelivery,
+  githubAppSchema,
   type GithubInstallation,
   hookConfigSchema,
   hookDeliverySchema,
@@ -82,6 +84,10 @@ export class GithubService {
       await this.app.appJwt(),
       { method: 'POST' },
     );
+  }
+
+  async getApp(): Promise<GithubApp> {
+    return githubFetch('/app', await this.app.appJwt(), githubAppSchema);
   }
 
   // True when the App has a webhook URL set. GitHub only sends events to Apps with an active webhook.

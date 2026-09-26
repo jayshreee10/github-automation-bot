@@ -12,6 +12,8 @@ import { WebhookDeliveryRepository } from './webhook-delivery.repository.js';
 const INTERVAL_MS = 15 * 60_000;
 const LOOKBACK_MS = 3 * 24 * 60 * 60_000;
 const MAX_REDELIVERIES_PER_RUN = 10;
+// Recovered counts cover 24 hours; a week of requests is plenty.
+const KEEP_REQUESTS_MS = 7 * 24 * 60 * 60_000;
 
 // Recovers deliveries GitHub could not hand us (downtime, 5xx): on boot and every 15 min,
 // finds guids we never stored whose latest attempt failed, and asks GitHub to redeliver them.
@@ -35,9 +37,15 @@ export class CatchUpService implements OnApplicationBootstrap {
     if (this.running) return;
     this.running = true;
     try {
+      await this.deliveries.pruneRedeliveries(
+        new Date(Date.now() - KEEP_REQUESTS_MS),
+      );
       const failed = await this.findMissedFailures();
       const batch = failed.slice(0, MAX_REDELIVERIES_PER_RUN);
-      for (const d of batch) await this.github.redeliver(d.id);
+      for (const d of batch) {
+        await this.github.redeliver(d.id);
+        await this.deliveries.recordRedelivery(d.guid);
+      }
       this.logger.log(
         `Catch-up: ${failed.length} missed deliveries, ${batch.length} redelivery requested`,
       );

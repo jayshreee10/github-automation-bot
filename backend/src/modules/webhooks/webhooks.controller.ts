@@ -20,6 +20,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
+import { requestContext } from '../../core/context/request-context.js';
 import { Public } from '../auth/public.decorator.js';
 import { WebhookSignatureGuard } from './webhook-signature.guard.js';
 import {
@@ -66,6 +67,8 @@ export class WebhooksController {
   ): Promise<object | undefined> {
     const headers = webhookHeadersSchema.safeParse(rawHeaders);
     if (!headers.success || !req.rawBody) throw new BadRequestException();
+    const deliveryId = headers.data['x-github-delivery'];
+    requestContext.set({ deliveryId });
 
     const result = await this.webhooks.ingest(
       headers.data,
@@ -73,7 +76,7 @@ export class WebhooksController {
       req.rawBody,
     );
     this.logger.log(
-      `Delivery ${headers.data['x-github-delivery']} ${headers.data['x-github-event']}: ${result}`,
+      `Delivery ${deliveryId} ${headers.data['x-github-event']}: ${result}`,
     );
     const { status, body } = RESPONSES[result];
     res.status(status);

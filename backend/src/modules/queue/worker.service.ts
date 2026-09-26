@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { ConfigService } from '../../core/config/config.service.js';
+import { requestContext } from '../../core/context/request-context.js';
 import { errorMessage } from '../../core/errors/error-message.js';
 import { HandlerRegistry } from './handler.registry.js';
 import { PermanentJobError } from './job-errors.js';
@@ -47,7 +48,14 @@ export class WorkerService implements BeforeApplicationShutdown {
 
   private async runBatch(): Promise<void> {
     const claimed = await this.jobs.claim(BATCH_SIZE);
-    await Promise.all(claimed.map((job) => this.run(job)));
+    // Each job gets its own context, so its log lines and those of its handlers carry its ids.
+    await Promise.all(
+      claimed.map((job) =>
+        requestContext.run({ deliveryId: job.deliveryId, jobId: job.id }, () =>
+          this.run(job),
+        ),
+      ),
+    );
   }
 
   private async run(job: ClaimedJob): Promise<void> {

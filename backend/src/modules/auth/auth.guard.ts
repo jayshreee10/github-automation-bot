@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { requestContext } from '../../core/context/request-context.js';
 import { AuthService } from './auth.service.js';
 import type { AuthenticatedRequest } from './auth.types.js';
 import { IS_PUBLIC_KEY } from './public.decorator.js';
@@ -29,6 +30,7 @@ export class AuthGuard implements CanActivate {
     if (scheme !== 'Bearer' || !token) throw new UnauthorizedException();
 
     request.user = await this.auth.verify(token);
+    requestContext.set({ userId: request.user.id });
     return true;
   }
 }

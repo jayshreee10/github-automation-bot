@@ -24,6 +24,11 @@ const envSchema = z.object({
     }),
   // Secret. Same value as the App's webhook secret; HMAC key for X-Hub-Signature-256.
   GITHUB_WEBHOOK_SECRET: z.string().min(32),
+  // Secret. Slack Incoming Webhook; optional so the app boots without it, Slack actions then fail permanently.
+  SLACK_WEBHOOK_URL: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.url({ protocol: /^https$/, hostname: /^hooks\.slack\.com$/ }).optional(),
+  ),
   // Dev only: smee.io channel that `npm run webhooks` forwards to localhost.
   SMEE_URL: z.url({ protocol: /^https$/ }).optional(),
   // Dev only: jobs for this event throw a transient error, to exercise retries. Ignored in production.

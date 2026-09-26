@@ -22,12 +22,23 @@ export class AuthService {
         issuer: this.issuer,
         algorithms: ['EdDSA'],
       });
-      if (!payload.sub) throw new errors.JWTClaimValidationFailed('missing sub', payload, 'sub');
+      if (!payload.sub)
+        throw new errors.JWTClaimValidationFailed(
+          'missing sub',
+          payload,
+          'sub',
+        );
 
       return {
         id: payload.sub,
         email: typeof payload.email === 'string' ? payload.email : null,
         name: typeof payload.name === 'string' ? payload.name : null,
+        // Only https URLs, so the avatar can never be a javascript: or data: URL.
+        image:
+          typeof payload.image === 'string' &&
+          payload.image.startsWith('https://')
+            ? payload.image
+            : null,
       };
     } catch (err) {
       // Log only the failure code; the token itself never reaches the logs.

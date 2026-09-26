@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { githubFetch } from './github-client.js';
+import { GithubApiError, githubFetch } from './github-client.js';
 import { GithubAppService } from './github-app.service.js';
 import { installationTokenSchema } from './github.types.js';
 
@@ -30,6 +30,20 @@ export class InstallationTokenService {
       expiresAt: Date.parse(expires_at),
     });
     return token;
+  }
+
+  // Runs a call with the installation token; on 401 the cached token is dropped and the call retried once.
+  async withToken<T>(
+    installationId: number,
+    call: (token: string) => Promise<T>,
+  ): Promise<T> {
+    try {
+      return await call(await this.tokenFor(installationId));
+    } catch (err) {
+      if (!(err instanceof GithubApiError) || err.status !== 401) throw err;
+      this.forget(installationId);
+      return call(await this.tokenFor(installationId));
+    }
   }
 
   // Drop a cached token, e.g. after the installation is removed.

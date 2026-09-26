@@ -2,13 +2,16 @@ import type { z } from 'zod';
 
 const API = 'https://api.github.com';
 
-// Carries only the HTTP status and path; response bodies may echo request data, so they are not kept.
+// Carries only status, path and a rate-limit flag; response bodies may echo request data, so they are not kept.
 export class GithubApiError extends Error {
   constructor(
     readonly status: number,
     readonly path: string,
+    readonly rateLimited = false,
   ) {
-    super(`GitHub API ${status} on ${path}`);
+    super(
+      `GitHub API ${status} on ${path}${rateLimited ? ' (rate limited)' : ''}`,
+    );
     this.name = 'GithubApiError';
   }
 }
@@ -60,10 +63,20 @@ export async function githubRequest(
       'X-GitHub-Api-Version': '2022-11-28',
       'User-Agent': 'github-automation-bot',
       Authorization: `Bearer ${token}`,
+      ...(init.body ? { 'Content-Type': 'application/json' } : {}),
       ...init.headers,
     },
     signal: init.signal ?? AbortSignal.timeout(10_000),
   });
-  if (!res.ok) throw new GithubApiError(res.status, path);
+  if (!res.ok) throw new GithubApiError(res.status, path, isRateLimited(res));
   return res;
+}
+
+// GitHub signals primary and secondary rate limits with 403 or 429 plus one of these headers.
+function isRateLimited(res: Response): boolean {
+  if (res.status !== 403 && res.status !== 429) return false;
+  return (
+    res.headers.get('x-ratelimit-remaining') === '0' ||
+    res.headers.has('retry-after')
+  );
 }

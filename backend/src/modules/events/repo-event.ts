@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { PermanentJobError } from '../queue/job-errors.js';
 
-// One shape for issues, pull_request and push: the rule matcher's input in phase 4.
+// One shape for issues, pull_request and push: the rule matcher's input.
 export interface RepoEvent {
   deliveryId: string;
   event: 'issues' | 'pull_request' | 'push';

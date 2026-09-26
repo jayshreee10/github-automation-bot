@@ -5,13 +5,20 @@ export const repositorySchema = z.object({
   id: z.string(),
   fullName: z.string(),
   isPrivate: z.boolean(),
+  // Null until the next sync for repos stored before this field existed.
+  defaultBranch: z.string().nullable(),
   installationId: z.string(),
   accountLogin: z.string(),
+  ruleCount: z.number(),
+  lastEventAt: z.iso.datetime().nullable(),
 });
 
+// accountType (User / Organization) and repositorySelection (all / selected) fill in on the next sync.
 export const installationSummarySchema = z.object({
   id: z.string(),
   accountLogin: z.string(),
+  accountType: z.string().nullable(),
+  repositorySelection: z.string().nullable(),
 });
 
 export const repositoryListSchema = z.object({

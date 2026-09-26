@@ -38,4 +38,19 @@ export class WebhookDeliveryRepository {
     });
     return new Set(rows.map((r) => r.id));
   }
+
+  // Remembers a redelivery we asked for, so the dashboard can count recovered deliveries.
+  async recordRedelivery(deliveryId: string): Promise<void> {
+    await this.prisma.redeliveryRequest.upsert({
+      where: { deliveryId },
+      create: { deliveryId },
+      update: {},
+    });
+  }
+
+  async pruneRedeliveries(before: Date): Promise<void> {
+    await this.prisma.redeliveryRequest.deleteMany({
+      where: { requestedAt: { lt: before } },
+    });
+  }
 }

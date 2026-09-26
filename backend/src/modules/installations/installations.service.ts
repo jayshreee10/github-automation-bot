@@ -52,7 +52,7 @@ export class InstallationsService {
     await this.installations.saveWithRepos(
       installationId,
       userId,
-      installation.account,
+      installation,
       repos,
     );
 
@@ -101,22 +101,34 @@ export class InstallationsService {
 
   // Installations are returned separately so one with zero repos still shows Sync / Manage in the UI.
   async list(userId: string): Promise<RepositoryList> {
-    const installations = await this.installations.listForUser(userId);
-    return {
-      installations: installations.map((i) => ({
-        id: i.id.toString(),
-        accountLogin: i.githubAccountLogin,
-      })),
-      repositories: installations.flatMap((i) =>
-        i.repositories.map((r) => ({
-          id: r.id.toString(),
-          fullName: r.fullName,
-          isPrivate: r.isPrivate,
-          installationId: i.id.toString(),
-          accountLogin: i.githubAccountLogin,
-        })),
-      ),
-    };
+    const rows = await this.installations.listForUser(userId);
+    const installations = new Map<
+      string,
+      RepositoryList['installations'][number]
+    >();
+    const repositories: RepositoryList['repositories'] = [];
+    for (const row of rows) {
+      const installationId = row.installationId.toString();
+      if (!installations.has(installationId))
+        installations.set(installationId, {
+          id: installationId,
+          accountLogin: row.accountLogin,
+          accountType: row.accountType,
+          repositorySelection: row.repositorySelection,
+        });
+      if (row.repoId === null || row.fullName === null) continue;
+      repositories.push({
+        id: row.repoId.toString(),
+        fullName: row.fullName,
+        isPrivate: row.isPrivate ?? false,
+        defaultBranch: row.defaultBranch,
+        installationId,
+        accountLogin: row.accountLogin,
+        ruleCount: row.ruleCount,
+        lastEventAt: row.lastEventAt?.toISOString() ?? null,
+      });
+    }
+    return { installations: [...installations.values()], repositories };
   }
 
   private async isGone(installationId: number): Promise<boolean> {
