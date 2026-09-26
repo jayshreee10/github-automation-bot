@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:oklch(0.9892 0.0054 117.9205)}
+*{box-sizing:border-box}
+.app{--background:oklch(0.9892 0.0054 117.9205);--foreground:oklch(0.2077 0.0398 265.7549);--card:oklch(1 0 0);--primary:oklch(0.8871 0.2122 128.5041);--primary-foreground:oklch(0 0 0);--secondary:oklch(0.3717 0.0392 257.287);--secondary-foreground:oklch(0.9842 0.0034 247.8575);--muted:oklch(0.9683 0.0069 247.8956);--muted-foreground:oklch(0.5544 0.0407 257.4166);--accent:oklch(0.9819 0.0181 155.8263);--accent-foreground:oklch(0.4479 0.1083 151.3277);--destructive:oklch(0.6368 0.2078 25.3313);--destructive-text:oklch(0.52 0.19 25);--border:oklch(0.9288 0.0126 255.5078);--input:oklch(0.9288 0.0126 255.5078);--ring:oklch(0.8871 0.2122 128.5041);--chart-1:oklch(0.8871 0.2122 128.5041);--chart-2:oklch(0.3717 0.0392 257.287);--chart-3:oklch(0.7227 0.192 149.5793);--chart-4:oklch(0.5544 0.0407 257.4166);--chart-5:oklch(0.7107 0.0351 256.7878);--sidebar:oklch(1 0 0);--sidebar-accent:oklch(0.9842 0.0034 247.8575);--warn-bg:oklch(0.97 0.06 90);--warn-fg:oklch(0.5 0.12 65);--radius:1rem;--shadow-sm:0px 8px 20px 0px hsl(0 0% 0% / 0.05),0px 1px 2px -1px hsl(0 0% 0% / 0.05);font-family:Inter,system-ui,sans-serif;letter-spacing:-0.01em;color:var(--foreground);background:var(--background);font-size:14px;line-height:1.45}
+.app.dark{--background:oklch(0.1288 0.0406 264.6952);--foreground:oklch(0.9842 0.0034 247.8575);--card:oklch(0.2077 0.0398 265.7549);--secondary:oklch(0.2795 0.0368 260.031);--secondary-foreground:oklch(0.9842 0.0034 247.8575);--muted:oklch(0.2795 0.0368 260.031);--muted-foreground:oklch(0.7107 0.0351 256.7878);--accent:oklch(0.3925 0.0896 152.5353);--accent-foreground:oklch(0.8871 0.2122 128.5041);--destructive:oklch(0.4437 0.1613 26.8994);--destructive-text:oklch(0.78 0.14 25);--border:oklch(0.2795 0.0368 260.031);--input:oklch(0.2795 0.0368 260.031);--chart-2:oklch(0.6231 0.188 259.8145);--chart-4:oklch(0.6268 0.2325 303.9004);--chart-5:oklch(0.7686 0.1647 70.0804);--sidebar:oklch(0.1288 0.0406 264.6952);--sidebar-accent:oklch(0.2795 0.0368 260.031);--warn-bg:oklch(0.35 0.07 70);--warn-fg:oklch(0.88 0.13 85);--shadow-sm:0px 10px 25px 0px hsl(0 0% 0% / 0.4),0px 1px 2px -1px hsl(0 0% 0% / 0.4)}
+.muted{color:var(--muted-foreground)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0}
+.h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-0.035em}
+.h2{margin:0;font-size:16px;font-weight:600;letter-spacing:-0.02em}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 14px;border-radius:12px;font:inherit;font-size:14px;font-weight:500;border:1px solid transparent;cursor:pointer;text-decoration:none;white-space:nowrap;color:var(--foreground);background:transparent}
+.btn-primary{background:var(--primary);color:var(--primary-foreground)}
+.btn-secondary{background:var(--secondary);color:var(--secondary-foreground)}
+.btn-outline{background:var(--card);border-color:var(--border)}
+.btn-ghost:hover,.btn-outline:hover{background:var(--muted)}
+.btn-destructive{background:var(--destructive);color:#fff}
+.btn-sm{height:32px;padding:0 10px;font-size:13px;border-radius:10px}
+.btn-lg{height:44px;padding:0 20px;font-size:15px}
+.btn-icon{width:36px;padding:0}
+.btn-sm.btn-icon{width:32px}
+.badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:500;border:1px solid transparent;white-space:nowrap}
+.b-success{background:var(--accent);color:var(--accent-foreground)}
+.b-outline{border-color:var(--border);color:var(--foreground)}
+.b-muted{background:var(--muted);color:var(--muted-foreground)}
+.b-destructive{background:color-mix(in oklch,var(--destructive) 14%,transparent);color:var(--destructive-text)}
+.b-warn{background:var(--warn-bg);color:var(--warn-fg)}
+.b-primary{background:var(--primary);color:#000}
+.chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;border-radius:8px;background:var(--muted);font-size:12px;font-weight:500;white-space:nowrap}
+.input{height:36px;width:100%;border:1px solid var(--input);border-radius:12px;padding:0 12px;background:var(--card);font:inherit;font-size:14px;color:inherit;display:flex;align-items:center;gap:8px}
+.label{font-size:14px;font-weight:500}
+.switch{width:36px;height:20px;border-radius:999px;background:var(--input);position:relative;border:0;padding:0;cursor:pointer;flex-shrink:0}
+.switch.on{background:var(--primary)}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px hsl(0 0% 0% / 0.2)}
+.switch.on::after{left:18px}
+.navhead{font-size:12px;font-weight:500;color:var(--muted-foreground);padding:0 10px 6px}
+.navlink{display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;border-radius:10px;color:var(--foreground);text-decoration:none;font-size:14px;font-weight:500}
+.navlink:hover{background:var(--sidebar-accent)}
+.navlink.active{background:var(--muted);font-weight:600}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--secondary);color:var(--secondary-foreground);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--chart-3);display:inline-block;flex-shrink:0}
+.pulse{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in oklch,var(--chart-3) 60%,transparent)}50%{box-shadow:0 0 0 5px transparent}}
+.kv{display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:13px;padding:9px 0;border-bottom:1px solid var(--border)}
+.kv:last-child{border-bottom:0}
+.sep{height:1px;background:var(--border);flex-shrink:0}
+.snav{display:flex;align-items:center;height:34px;padding:0 12px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:500;color:var(--muted-foreground)}
+.snav.active{background:var(--muted);color:var(--foreground)}
+a{color:var(--foreground)}a:hover{color:var(--muted-foreground)}
+</style>
+</helmet>
+<div class="app {{mode}}" style="width: 1440px; height: 960px; display: flex; overflow: hidden">
+<aside style="width: 256px; flex-shrink: 0; height: 100%; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px 12px; gap: 24px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 4px 8px">
+<div style="width: 32px; height: 32px; border-radius: 10px; background: var(--primary); color: #000; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg></div>
+<div style="display: flex; flex-direction: column"><span style="font-weight: 600">Automation Bot</span><span class="muted" style="font-size: 12px">GitHub → Slack</span></div>
+</div>
+<nav style="display: flex; flex-direction: column; gap: 2px">
+<span class="navhead">Workspace</span>
+<a href="Dashboard.dc.html" class="navlink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>Dashboard</a>
+<a href="Events.dc.html" class="navlink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>Event log</a>
+<a href="Repositories.dc.html" class="navlink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" x2="6" y1="3" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>Repositories<span class="badge b-muted" style="margin-left: auto">3</span></a>
+<a href="Rules.dc.html" class="navlink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M7 12h10"></path><path d="M10 18h4"></path></svg>Rules</a>
+<a href="Failures.dc.html" class="navlink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>Failures<span class="badge b-destructive" style="margin-left: auto">3</span></a>
+<span class="navhead" style="margin-top: 16px">Configure</span>
+<a href="Settings.dc.html" class="navlink active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg>Settings</a>
+</nav>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px">
+<div style="border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600"><span class="dot pulse"></span>Webhook healthy</div>
+<span class="muted" style="font-size: 12px">Last delivery 12s ago · queue 0</span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 4px 6px">
+<span class="avatar">NR</span>
+<div style="display: flex; flex-direction: column; min-width: 0; flex-grow: 1"><span style="font-weight: 600; font-size: 13px">Narayan</span><span class="muted" style="font-size: 12px">@narayann7</span></div>
+<a href="Main.dc.html" class="btn btn-ghost btn-sm btn-icon" aria-label="Sign out"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg></a>
+</div>
+</div>
+</aside>
+<main style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+<header style="height: 64px; flex-shrink: 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; padding: 0 32px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 14px"><span class="muted">Configure</span><span class="muted">/</span><span style="font-weight: 600">Settings</span></div>
+<div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+<button type="button" class="btn btn-outline btn-sm btn-icon" aria-label="Toggle dark mode"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button>
+</div>
+</header>
+<div style="flex-grow: 1; padding: 28px 32px; display: flex; flex-direction: column; gap: 24px; overflow: hidden">
+<div style="display: flex; flex-direction: column; gap: 4px"><h1 class="h1">Settings</h1><p class="muted" style="margin: 0">Notification channel, GitHub connection and your account.</p></div>
+<div style="display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 32px; align-items: start">
+<nav aria-label="Settings sections" style="display: flex; flex-direction: column; gap: 2px">
+<a href="#slack" class="snav active">Slack</a>
+<a href="#github" class="snav">GitHub App</a>
+<a href="#account" class="snav">Account</a>
+</nav>
+<div style="display: flex; flex-direction: column; gap: 16px; max-width: 820px">
+<section id="slack" class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; align-items: flex-start; gap: 12px">
+<span style="width: 36px; height: 36px; border-radius: 10px; background: var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="8" y1="3" y2="21"></line><line x1="16" x2="14" y1="3" y2="21"></line></svg></span>
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 class="h2">Slack notifications</h2><span class="muted" style="font-size: 13px">Messages go to an Incoming Webhook. Rules can pick a channel label.</span></div>
+<span class="badge b-success" style="margin-left: auto"><span class="dot"></span>Connected</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label class="label" for="slack-url">Incoming webhook URL</label>
+<div style="display: flex; gap: 8px"><input id="slack-url" class="input mono" type="password" value="https://hooks.slack.com/services/T000/B000/XXXXXXXX" style="font-size: 13px"><button type="button" class="btn btn-outline">Replace</button></div>
+<span class="muted" style="font-size: 12px">Stored encrypted on the server. Only the last 4 characters are ever shown: ••••XXXX</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px"><label class="label" for="slack-channel">Default channel label</label><input id="slack-channel" class="input" type="text" value="#eng-alerts"></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="label">Include event link</span><div class="input" style="justify-content: space-between"><span class="muted" style="font-size: 13px">Add a GitHub link to each message</span><button type="button" class="switch on" role="switch" aria-checked="true" aria-label="Include event link"></button></div></div>
+</div>
+<div class="sep"></div>
+<div style="display: flex; gap: 8px; justify-content: flex-end"><button type="button" class="btn btn-outline">Send test message</button><button type="button" class="btn btn-primary">Save changes</button></div>
+</section>
+<section id="github" class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: flex-start; gap: 12px">
+<span style="width: 36px; height: 36px; border-radius: 10px; background: var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 class="h2">GitHub App</h2><span class="muted" style="font-size: 13px">Receives webhooks and acts with short-lived installation tokens.</span></div>
+<a href="Repositories.dc.html" class="btn btn-outline btn-sm" style="margin-left: auto">Manage repositories</a>
+</div>
+<div style="display: flex; flex-direction: column">
+<div class="kv"><span class="muted">Webhook endpoint</span><span style="display: flex; align-items: center; gap: 8px"><span class="mono">https://[YOUR-API-HOST]/api/webhooks/github</span><button type="button" class="btn btn-ghost btn-sm btn-icon" aria-label="Copy webhook URL" style="height: 26px; width: 26px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></span></div>
+<div class="kv"><span class="muted">Webhook secret</span><span class="badge b-success">Configured · HMAC-SHA256</span></div>
+<div class="kv"><span class="muted">Installations</span><span>2 accounts · 3 repositories</span></div>
+<div class="kv"><span class="muted">Last catch-up after restart</span><span>Today 09:12 · 4 missed deliveries redelivered</span></div>
+</div>
+</section>
+<section id="account" class="card" style="padding: 24px; display: flex; align-items: center; gap: 14px">
+<span class="avatar" style="width: 40px; height: 40px">NR</span>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Narayan · @narayann7</span><span class="muted" style="font-size: 13px">Signed in with GitHub</span></div>
+<div style="margin-left: auto; display: flex; gap: 8px"><a href="Main.dc.html" class="btn btn-outline">Sign out</a><button type="button" class="btn btn-ghost" style="color: var(--destructive-text)">Disconnect all repos</button></div>
+</section>
+</div>
+</div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+renderVals() {
+return { mode: this.props.dark ? 'dark' : '' };
+}
+}
+</script>
+</body>
+</html>

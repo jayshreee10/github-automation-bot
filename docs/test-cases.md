@@ -9,7 +9,7 @@ Run them on the deployed URL (or a local backend with smee) against a throwaway 
 **Setup before running**
 
 - A GitHub account that owns a test repository, with the GitHub App installed on it.
-- A Slack channel whose Incoming Webhook URL is set in `SLACK_WEBHOOK_URL`.
+- A Slack channel whose Incoming Webhook URL is saved in Settings → Slack.
 - A second GitHub account (or incognito window) for the access-control cases.
 - `GITHUB_WEBHOOK_SECRET` available locally for the signature cases (never shared).
 
