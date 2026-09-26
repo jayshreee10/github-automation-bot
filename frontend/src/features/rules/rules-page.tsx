@@ -3,13 +3,13 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { Segmented } from '@/components/segmented'
 import { Button } from '@/components/ui/button'
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRepositories } from '@/features/repositories/use-repositories'
 import { TopBar } from '@/features/shell/top-bar'
 import { useRepoFilter } from '@/features/shell/use-repo-filter'
 import { filterRules, type RuleFilter } from './rule-filter'
+import { RuleTemplateCards } from './rule-template-cards'
 import { RuleTable } from './rule-table'
 import { useRules } from './use-rules'
 
@@ -67,12 +67,25 @@ export function RulesPage() {
         {error && <p className="error-text">{error}</p>}
         {rules === null && !error && <Skeleton className="table-skeleton" />}
         {rules?.length === 0 && (
-          <Empty className="empty-card">
-            <EmptyHeader>
-              <EmptyTitle>No rules yet</EmptyTitle>
-              <EmptyDescription>Rules tell the bot what to do when an issue, pull request or push arrives.</EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <section className="panel rules-empty" aria-labelledby="rules-empty-title">
+            <div className="rules-empty-head">
+              <div>
+                <h2 id="rules-empty-title" className="section-title">
+                  No rules yet
+                </h2>
+                <p className="muted-text">
+                  Pick a starter rule to open it pre-filled. Nothing runs until you review and save it.
+                </p>
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link to={{ pathname: '/rules/new', search }}>
+                  <Plus />
+                  Start from scratch
+                </Link>
+              </Button>
+            </div>
+            <RuleTemplateCards repoId={repoId} />
+          </section>
         )}
         {rules && rules.length > 0 && shown?.length === 0 && <p className="muted-text">No rules match this filter.</p>}
         {shown && shown.length > 0 && (

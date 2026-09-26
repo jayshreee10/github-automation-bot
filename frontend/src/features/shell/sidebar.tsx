@@ -5,6 +5,7 @@ import {
   ListChecks,
   LogOut,
   ScrollText,
+  SlidersHorizontal,
   TriangleAlert,
 } from "lucide-react";
 import { NavLink } from "react-router";
@@ -75,6 +76,11 @@ export function Sidebar() {
             )}
           </NavLink>
         ))}
+        <span className="side-nav-heading side-nav-heading-gap">Configure</span>
+        <NavLink to={{ pathname: "/settings", search }} className="side-link">
+          <SlidersHorizontal />
+          Settings
+        </NavLink>
       </nav>
 
       <div className="sidebar-footer">

@@ -98,4 +98,11 @@ describe('RulesPage', () => {
     renderAt()
     expect(await screen.findByText('No rules yet')).toBeTruthy()
   })
+
+  it('offers starter templates when there are no rules', async () => {
+    vi.mocked(fetchRules).mockResolvedValue([])
+    renderAt()
+    await screen.findByText('No rules yet')
+    expect(screen.getByRole('link', { name: /Notify Slack on push/ }).getAttribute('href')).toBe('/rules/new?repo=42&template=slack-on-push')
+  })
 })

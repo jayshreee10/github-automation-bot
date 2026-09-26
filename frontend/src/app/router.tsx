@@ -10,6 +10,7 @@ import { InstallationGate } from '@/features/repositories/installation-gate'
 import { RepositoriesPage } from '@/features/repositories/repositories-page'
 import { RuleFormPage } from '@/features/rules/rule-form-page'
 import { RulesPage } from '@/features/rules/rules-page'
+import { SettingsPage } from '@/features/settings/settings-page'
 import { AppShell } from '@/features/shell/app-shell'
 import { ErrorScreen } from '@/features/shell/error-screen'
 
@@ -39,6 +40,7 @@ export const router = createBrowserRouter([
                   { path: '/rules/:id', element: <RuleFormPage /> },
                   { path: '/failures', element: <FailuresPage /> },
                   { path: '/repositories', element: <RepositoriesPage /> },
+                  { path: '/settings', element: <SettingsPage /> },
                 ],
               },
             ],

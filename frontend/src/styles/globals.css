@@ -14,6 +14,7 @@
 @import "./components/events.css";
 @import "./components/rules.css";
 @import "./components/failures.css";
+@import "./components/settings.css";
 
 @custom-variant dark (&:is(.dark *));
 

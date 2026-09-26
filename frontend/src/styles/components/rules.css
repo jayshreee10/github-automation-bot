@@ -55,6 +55,79 @@
     @apply size-4 shrink-0;
   }
 
+  /* Starter templates: empty state and blank new rule. */
+  .rules-empty {
+    @apply flex flex-col gap-5 p-6;
+  }
+
+  .rules-empty-head {
+    @apply flex flex-wrap items-start justify-between gap-3;
+  }
+
+  .rules-empty-head .muted-text {
+    @apply mt-1;
+  }
+
+  .rule-templates {
+    @apply grid gap-3 md:grid-cols-3;
+  }
+
+  .rule-template {
+    @apply flex h-full flex-col gap-2 rounded-xl border bg-background p-4 text-left no-underline transition-colors outline-none hover:border-primary/60 hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50;
+  }
+
+  .rule-template-icon {
+    @apply mb-1 inline-flex size-9 items-center justify-center rounded-lg bg-muted text-foreground;
+  }
+
+  .rule-template-icon svg {
+    @apply size-[18px];
+  }
+
+  .rule-template-icon[data-event='issues'] {
+    @apply bg-emerald-500/15 text-emerald-600 dark:text-emerald-400;
+  }
+
+  .rule-template-icon[data-event='pull_request'] {
+    @apply bg-violet-500/15 text-violet-600 dark:text-violet-400;
+  }
+
+  .rule-template-icon[data-event='push'] {
+    @apply bg-sky-500/15 text-sky-600 dark:text-sky-400;
+  }
+
+  .rule-template-name {
+    @apply text-sm font-semibold text-foreground;
+  }
+
+  .rule-template-text {
+    @apply text-[13px] text-muted-foreground;
+  }
+
+  .rule-template-flow {
+    @apply mt-1 flex flex-col gap-1.5 border-t pt-3;
+  }
+
+  .rule-template-step {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .rule-template-key {
+    @apply w-9 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase;
+  }
+
+  .rule-template-cta {
+    @apply mt-auto flex items-center gap-1 pt-2 text-[13px] font-medium text-foreground;
+  }
+
+  .rule-template-cta svg {
+    @apply size-3.5 transition-transform;
+  }
+
+  .rule-template:hover .rule-template-cta svg {
+    @apply translate-x-0.5;
+  }
+
   /* Editor: main column of cards, 400px summary column on the right. */
   .rule-editor {
     @apply grid items-start gap-5 px-8 py-6 lg:grid-cols-[minmax(0,1fr)_400px];

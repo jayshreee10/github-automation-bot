@@ -44,6 +44,10 @@
     @apply px-2.5 pb-1.5 text-xs font-medium text-muted-foreground;
   }
 
+  .side-nav-heading-gap {
+    @apply mt-4;
+  }
+
   .side-link {
     @apply flex h-9 items-center gap-2.5 rounded-[10px] px-2.5 text-sm font-medium text-foreground hover:bg-sidebar-accent;
   }

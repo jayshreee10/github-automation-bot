@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRepositories } from '@/features/repositories/use-repositories'
@@ -9,13 +9,16 @@ import { ApiError } from '@/lib/api'
 import { createRule, deleteRule, fetchRule, updateRule } from './api'
 import { RuleEditor } from './rule-editor'
 import { emptyRuleForm, ruleToForm } from './rule-form-values'
+import { templateForm } from './rule-templates'
 import type { Rule, RuleInput } from './schemas'
 
 // /rules/new and /rules/:id. A new rule starts on the filtered repo, or none: a silent default hides mistakes.
+// /rules/new?template=<id> prefills a starter rule; an unknown id falls back to a blank form.
 export function RuleFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { repoId, search } = useRepoFilter()
+  const template = useSearchParams()[0].get('template')
   const { data: repos, error: reposError } = useRepositories()
   // Tagged with its id, so switching rules never shows the previous one.
   const [loaded, setLoaded] = useState<{ id: string; rule: Rule | null; error: string | null } | null>(null)
@@ -70,12 +73,17 @@ export function RuleFormPage() {
     )
   }
 
+  const defaultBranch = repos.repositories.find((r) => r.id === repoId)?.defaultBranch ?? null
+  const fromTemplate = !id && template ? templateForm(template, repoId ?? '', defaultBranch) : null
+  const initial = current?.rule ? ruleToForm(current.rule) : (fromTemplate ?? emptyRuleForm(repoId ?? ''))
+
   return (
     <RuleEditor
-      key={id ?? 'new'}
-      initial={current?.rule ? ruleToForm(current.rule) : emptyRuleForm(repoId ?? '')}
+      key={id ?? `new:${template ?? ''}`}
+      initial={initial}
       repositories={repos.repositories}
       isNew={!id}
+      showTemplates={!id && !fromTemplate}
       onSave={save}
       onDelete={id ? remove : undefined}
       onCancel={back}

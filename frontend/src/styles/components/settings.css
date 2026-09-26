@@ -1,0 +1,95 @@
+/* Settings page: section nav on the left, one card per area on the right. */
+@layer components {
+  .settings-layout {
+    @apply grid items-start gap-8 md:grid-cols-[200px_minmax(0,1fr)];
+  }
+
+  .settings-nav {
+    @apply flex gap-0.5 md:sticky md:top-4 md:flex-col;
+  }
+
+  .settings-nav-link {
+    @apply flex h-[34px] items-center rounded-[10px] px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground;
+  }
+
+  .settings-sections {
+    @apply flex max-w-[820px] min-w-0 flex-col gap-4;
+  }
+
+  .settings-card {
+    @apply flex scroll-mt-4 flex-col gap-[18px] p-6;
+  }
+
+  .settings-card-head {
+    @apply flex items-start gap-3;
+  }
+
+  .settings-icon {
+    @apply flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-muted [&_svg]:size-[18px];
+  }
+
+  .settings-head-badge {
+    @apply ml-auto;
+  }
+
+  .settings-note {
+    @apply text-[13px] text-muted-foreground;
+  }
+
+  .settings-hint {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .settings-skeleton {
+    @apply h-40 w-full rounded-xl;
+  }
+
+  .settings-form {
+    @apply flex flex-col gap-[18px];
+  }
+
+  .settings-label-row {
+    @apply flex items-center gap-1.5;
+  }
+
+  .settings-info-link {
+    @apply inline-flex rounded-full text-muted-foreground hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none [&_svg]:size-4;
+  }
+
+  .settings-row {
+    @apply flex gap-2;
+  }
+
+  .settings-grid {
+    @apply grid gap-4 sm:grid-cols-2;
+  }
+
+  .settings-switch-box {
+    @apply flex h-9 items-center justify-between gap-2 rounded-xl border border-input px-3;
+  }
+
+  .settings-actions {
+    @apply flex justify-end gap-2 border-t pt-[18px];
+  }
+
+  .settings-kv-value {
+    @apply flex min-w-0 items-center gap-2 [&_.mono]:truncate;
+  }
+
+  .settings-account {
+    @apply flex scroll-mt-4 flex-wrap items-center gap-3.5 p-6;
+  }
+
+  .settings-avatar {
+    @apply size-10;
+  }
+
+  .settings-account-name {
+    @apply font-semibold;
+  }
+}
+
+/* Unlayered: the Button's own text colour utility would beat a layered rule. */
+.danger-text {
+  @apply text-destructive-text;
+}

@@ -136,4 +136,24 @@ describe('RuleFormPage', () => {
     await screen.findByText('rules list')
     expect(deleteRule).toHaveBeenCalledWith('r-1')
   })
+
+  it('prefills a template and offers templates only on a blank new rule', async () => {
+    vi.mocked(createRule).mockResolvedValue(rule())
+    renderAt('/rules/new?repo=42&template=label-bugs')
+    expect(((await screen.findByLabelText('Rule name')) as HTMLInputElement).value).toBe('Label bug reports')
+    expect(screen.queryByText('Start from a template')).toBeNull()
+    save()
+    await screen.findByText('rules list')
+    expect(vi.mocked(createRule).mock.calls[0][1]).toMatchObject({
+      event: 'issues',
+      conditions: { titleContains: ['bug'] },
+      actions: [{ type: 'add_label', labels: ['bug'] }],
+    })
+  })
+
+  it('shows template links on a blank new rule', async () => {
+    renderAt('/rules/new?repo=42')
+    await screen.findByText('Start from a template')
+    expect(screen.getByRole('link', { name: /Label bug reports/ }).getAttribute('href')).toBe('/rules/new?repo=42&template=label-bugs')
+  })
 })

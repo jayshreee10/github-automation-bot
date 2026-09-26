@@ -20,6 +20,7 @@ import type { Repository } from '@/features/repositories/schemas'
 import { TopBar } from '@/features/shell/top-bar'
 import { ChipInput } from './chip-input'
 import { ConditionEditor } from './condition-editor'
+import { RuleTemplateCards } from './rule-template-cards'
 import { formToInput, isDirty, type RuleFormErrors, type RuleFormValues, validateRuleForm } from './rule-form-values'
 import { ruleEventKeys, ruleSummary, shortRepoName } from './rule-sentence'
 import type { RuleEvent, RuleInput } from './schemas'
@@ -28,6 +29,8 @@ interface Props {
   initial: RuleFormValues
   repositories: Repository[]
   isNew: boolean
+  // Offer the starter templates above the form (a blank new rule).
+  showTemplates?: boolean
   onSave: (repositoryId: string, input: RuleInput) => Promise<void>
   onDelete?: () => Promise<void>
   onCancel: () => void
@@ -42,7 +45,7 @@ const EVENTS: { event: RuleEvent; label: string; icon: typeof CircleDot }[] = [
 const FORM_ID = 'rule-editor'
 
 // Create/edit a rule. Validates like the API before saving; the server's 400 message still wins if it disagrees.
-export function RuleEditor({ initial, repositories, isNew, onSave, onDelete, onCancel }: Props) {
+export function RuleEditor({ initial, repositories, isNew, showTemplates, onSave, onDelete, onCancel }: Props) {
   const [values, setValues] = useState(initial)
   const [errors, setErrors] = useState<RuleFormErrors>({})
   const [saving, setSaving] = useState(false)
@@ -89,6 +92,17 @@ export function RuleEditor({ initial, repositories, isNew, onSave, onDelete, onC
       />
       <form id={FORM_ID} className="rule-editor" onSubmit={submit} noValidate>
         <div className="editor-main">
+          {showTemplates && (
+            <section className="panel editor-card" aria-labelledby="rule-templates">
+              <div>
+                <h2 id="rule-templates" className="section-title">
+                  Start from a template
+                </h2>
+                <p className="muted-text">Or fill in the form below from scratch.</p>
+              </div>
+              <RuleTemplateCards repoId={values.repositoryId || null} />
+            </section>
+          )}
           <section className="panel editor-basics">
             <div className="editor-field">
               <label className="field-label" htmlFor="rule-name">
